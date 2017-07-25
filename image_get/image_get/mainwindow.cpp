@@ -193,6 +193,8 @@ void MainWindow::on_pushButton_2_clicked()
 
       criar funcao do tipo calculate_average (imageGrayScale, xi, yi, xf, yf)
 
+
+      TESTE TESTE TEST
    ------------------------------*/
    // int intensidade (const Mat &image)
 
