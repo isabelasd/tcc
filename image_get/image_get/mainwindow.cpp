@@ -5,6 +5,32 @@
 #include <QMessageBox>
 #include <QDir>
 
+/* ------------------------------------------------------
+ * MY FUNCTIONS
+ * ----------------------------------------------------- */
+int get_intensity (const Mat &image, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+{
+    int intensity = 0;
+    int aux = 0;
+    int el_count = 0 ;
+
+    for (int i = topLeftX + 1; i < bottomRightX; i++ )
+    {
+        for (int j = topLeftY + 1 ; j < bottomRightY; j++ )
+        {
+            aux = image.at<uchar>(Point(i,j));
+            intensity = intensity + aux ;
+           // aux = 0;
+            //qDebug() << "\n intensity_" << i << "_" << j << ": " << QString::number(aux) << " intensity_var : " << intensity ;
+            //intensity = 0 ;
+            el_count++;
+        }
+    }
+    intensity = intensity/el_count;
+    return intensity;
+
+
+}
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -168,7 +194,7 @@ void MainWindow::on_pushButton_2_clicked()
 
 
     // calculate average on the first rectangle
-
+    /*
     int intensity = 0;
     int aux = 0;
     int el_count = 0 ;
@@ -189,14 +215,27 @@ void MainWindow::on_pushButton_2_clicked()
 
     qDebug() << "\naverage = " << intensity << " elementos : " << el_count ;
 
-    /* --------------------------
 
-      criar funcao do tipo calculate_average (imageGrayScale, xi, yi, xf, yf)
+    */
 
 
-      TESTE TESTE TEST
-   ------------------------------*/
-   // int intensidade (const Mat &image)
+    // function to get average
+    // --------------------------
+
+   int intensityMark1 = 0;
+   int intensityMark2 = 0;
+   int intensityMark3 = 0;
+   int intensityMark4 = 0;
+   int intensityMark5 = 0;
+   int intensityMark6 = 0;
+
+
+   intensityMark1 = get_intensity(image_gray, coordinates[0],coordinates[1],coordinates[2],coordinates[3]);
+   intensityMark2 = get_intensity(image_gray, coordinates[4],coordinates[5],coordinates[6],coordinates[7]);
+   intensityMark3 = get_intensity(image_gray, coordinates[8],coordinates[9],coordinates[10],coordinates[11]);
+   intensityMark4 = get_intensity(image_gray, coordinates[12],coordinates[13],coordinates[14],coordinates[15]);
+   intensityMark5 = get_intensity(image_gray, coordinates[16],coordinates[17],coordinates[18],coordinates[19]);
+   intensityMark6 = get_intensity(image_gray, coordinates[20],coordinates[21],coordinates[22],coordinates[23]);
 
 
 
