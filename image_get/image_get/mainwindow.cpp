@@ -8,7 +8,12 @@
 /* ------------------------------------------------------
  * MY FUNCTIONS
  * ----------------------------------------------------- */
-int get_intensity (const Mat &image, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+// get average of a rectangle using a grayscale image
+// image : grayscale image
+// top left coordinate : (topLeftX, topLeftY)
+// bottomRight coordinate : (bottomRightX, bottomRightY)
+
+int getIntensityGray (const Mat &image, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
 {
     int intensity = 0;
     int aux = 0;
@@ -29,6 +34,55 @@ int get_intensity (const Mat &image, int topLeftX, int topLeftY, int bottomRight
     intensity = intensity/el_count;
     return intensity;
 
+
+}
+
+
+// get average of a rectangle using a BGR image
+// image : BGR image
+// top left coordinate : (topLeftX, topLeftY)
+// bottomRight coordinate : (bottomRightX, bottomRightY)
+
+void getIntensityBGR (const Mat &image, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY, int intensity_aux[])
+{
+    int el_count = 0 ;
+    int intensityB = 0 ;
+    int intensityG = 0 ;
+    int intensityR = 0 ;
+
+
+    for (int i = topLeftX + 1; i < bottomRightX; i++ )
+    {
+        for (int j = topLeftY + 1 ; j < bottomRightY; j++ )
+        {
+            Vec3b auxBGR = image.at<Vec3b>(j,i);
+            uchar blue = auxBGR.val[0];
+            uchar green = auxBGR.val[1];
+            uchar red = auxBGR.val[2];
+
+            int iblue = (int)blue;
+            int igreen = (int)green;
+            int ired = (int)red;
+
+            intensityB = intensityB + iblue ;
+            intensityG = intensityG + igreen ;
+            intensityR = intensityR + ired ;
+
+            iblue = 0;
+            igreen = 0;
+            ired = 0 ;
+            //intensity = 0 ;
+            el_count++;
+        }
+    }
+
+    intensityB = intensityB / el_count ;
+    intensityG = intensityG / el_count ;
+    intensityR = intensityR / el_count ;
+
+    intensity_aux[0] = intensityB ;
+    intensity_aux[1] = intensityG ;
+    intensity_aux[2] = intensityR ;
 
 }
 
@@ -173,7 +227,7 @@ void MainWindow::on_pushButton_2_clicked()
     // create image window
     namedWindow("Foto");
 
-    // draw markers
+    // draw markers    
     rectangle(image,Point(coordinates[0],coordinates[1]), Point(coordinates[2],coordinates[3]), Scalar(0,0,0), 1);
     rectangle(image,Point(coordinates[4],coordinates[5]), Point(coordinates[6],coordinates[7]), Scalar(0,0,0), 1);
     rectangle(image,Point(coordinates[8],coordinates[9]), Point(coordinates[10],coordinates[11]), Scalar(0,0,0), 1);
@@ -184,6 +238,8 @@ void MainWindow::on_pushButton_2_clicked()
     //show image -> image loaded in BGR format
     imshow("Foto",image);
 
+     // -----------------------
+    // Gray scale
     Mat image_gray(image.size(),CV_8UC1);
 
     // IT MUST BE BGR TO GRAY, OTHERWISE THE GRAYSCALE ITS NOT AS IT SHOULD BE
@@ -192,50 +248,110 @@ void MainWindow::on_pushButton_2_clicked()
 
     imshow("Foto gray",image_gray);
 
-
-    // calculate average on the first rectangle
-    /*
-    int intensity = 0;
-    int aux = 0;
-    int el_count = 0 ;
-
-    for (int i = coordinates[0] + 1; i < coordinates[2]; i++ )
-    {
-        for (int j = coordinates[1] + 1 ; j < coordinates[3]; j++ )
-        {
-            aux = image_gray.at<uchar>(Point(i,j));
-            intensity = intensity + aux ;
-           // aux = 0;
-            //qDebug() << "\n intensity_" << i << "_" << j << ": " << QString::number(aux) << " intensity_var : " << intensity ;
-            //intensity = 0 ;
-            el_count++;
-        }
-    }
-    intensity = intensity/el_count;
-
-    qDebug() << "\naverage = " << intensity << " elementos : " << el_count ;
-
-
-    */
+    //--------------------------------------------
 
 
     // function to get average
     // --------------------------
 
-   int intensityMark1 = 0;
-   int intensityMark2 = 0;
-   int intensityMark3 = 0;
-   int intensityMark4 = 0;
-   int intensityMark5 = 0;
-   int intensityMark6 = 0;
+   // Gray scale
+    /*
+   int intensityMarkGray1 = 0;
+   int intensityMarkGray2 = 0;
+   int intensityMarkGray3 = 0;
+   int intensityMarkGray4 = 0;
+   int intensityMarkGray5 = 0;
+   int intensityMarkGray6 = 0;
 
 
-   intensityMark1 = get_intensity(image_gray, coordinates[0],coordinates[1],coordinates[2],coordinates[3]);
-   intensityMark2 = get_intensity(image_gray, coordinates[4],coordinates[5],coordinates[6],coordinates[7]);
-   intensityMark3 = get_intensity(image_gray, coordinates[8],coordinates[9],coordinates[10],coordinates[11]);
-   intensityMark4 = get_intensity(image_gray, coordinates[12],coordinates[13],coordinates[14],coordinates[15]);
-   intensityMark5 = get_intensity(image_gray, coordinates[16],coordinates[17],coordinates[18],coordinates[19]);
-   intensityMark6 = get_intensity(image_gray, coordinates[20],coordinates[21],coordinates[22],coordinates[23]);
+   intensityMarkGray1 = getIntensityGray(image_gray, coordinates[0],coordinates[1],coordinates[2],coordinates[3]);
+   intensityMarkGray2 = getIntensityGray(image_gray, coordinates[4],coordinates[5],coordinates[6],coordinates[7]);
+   intensityMarkGray3 = getIntensityGray(image_gray, coordinates[8],coordinates[9],coordinates[10],coordinates[11]);
+   intensityMarkGray4 = getIntensityGray(image_gray, coordinates[12],coordinates[13],coordinates[14],coordinates[15]);
+   intensityMarkGray5 = getIntensityGray(image_gray, coordinates[16],coordinates[17],coordinates[18],coordinates[19]);
+   intensityMarkGray6 = getIntensityGray(image_gray, coordinates[20],coordinates[21],coordinates[22],coordinates[23]);
+
+   qDebug() << "\nintensidade 1 :" << QString::number(intensityMarkGray1) <<
+               "\nintensidade 2 :" << QString::number(intensityMarkGray2) <<
+               "\nintensidade 3 :" << QString::number(intensityMarkGray3) <<
+               "\nintensidade 4 :" << QString::number(intensityMarkGray4) <<
+               "\nintensidade 5 :" << QString::number(intensityMarkGray5) <<
+               "\nintensidade 6 :" << QString::number(intensityMarkGray6)
+               ;
+
+               */
+   //-------------------------------------------------
+
+   //-----------------------------------------------------
+   // BGR
+
+   int intensityMark1[3] = {};
+   int intensityMark2[3] = {};
+   int intensityMark3[3] = {};
+   int intensityMark4[3] = {};
+   int intensityMark5[3] = {};
+   int intensityMark6[3] = {};
+
+   intensity[0] = 0 ;
+   intensity[1] = 0 ;
+   intensity[2] = 0 ;
+
+   getIntensityBGR(image, coordinates[0],coordinates[1],coordinates[2],coordinates[3], intensity);
+   intensityMark1[0] = intensity[0];
+   intensityMark1[1] = intensity[1];
+   intensityMark1[2] = intensity[2];
+   qDebug() << "\nintensidade 1 : " << QString::number(intensityMark1[0]) <<
+                              "," << QString::number(intensityMark1[1]) <<
+                              "," << QString::number(intensityMark1[2])
+               ;
+
+   getIntensityBGR(image, coordinates[4],coordinates[5],coordinates[6],coordinates[7], intensity);
+   intensityMark2[0] = intensity[0];
+   intensityMark2[1] = intensity[1];
+   intensityMark2[2] = intensity[2];
+   qDebug() << "\nintensidade 2 : " << QString::number(intensityMark2[0]) <<
+                              "," << QString::number(intensityMark2[1]) <<
+                              "," << QString::number(intensityMark2[2])
+               ;
+
+   getIntensityBGR(image, coordinates[8],coordinates[9],coordinates[10],coordinates[11], intensity);
+   intensityMark3[0] = intensity[0];
+   intensityMark3[1] = intensity[1];
+   intensityMark3[2] = intensity[2];
+   qDebug() << "\nintensidade 3 : " << QString::number(intensityMark3[0]) <<
+                              "," << QString::number(intensityMark3[1]) <<
+                              "," << QString::number(intensityMark3[2])
+               ;
+
+   getIntensityBGR(image, coordinates[12],coordinates[13],coordinates[14],coordinates[15], intensity);
+   intensityMark4[0] = intensity[0];
+   intensityMark4[1] = intensity[1];
+   intensityMark4[2] = intensity[2];
+   qDebug() << "\nintensidade 4 : " << QString::number(intensityMark4[0]) <<
+                              "," << QString::number(intensityMark4[1]) <<
+                              "," << QString::number(intensityMark4[2])
+               ;
+
+   getIntensityBGR(image, coordinates[16],coordinates[17],coordinates[18],coordinates[19], intensity);
+   intensityMark5[0] = intensity[0];
+   intensityMark5[1] = intensity[1];
+   intensityMark5[2] = intensity[2];
+   qDebug() << "\nintensidade 5 : " << QString::number(intensityMark5[0]) <<
+                              "," << QString::number(intensityMark5[1]) <<
+                              "," << QString::number(intensityMark5[2])
+               ;
+
+   getIntensityBGR(image, coordinates[20],coordinates[21],coordinates[22],coordinates[23], intensity);
+   intensityMark6[0] = intensity[0];
+   intensityMark6[1] = intensity[1];
+   intensityMark6[2] = intensity[2];
+
+   qDebug() << "\nintensidade 6 : " << QString::number(intensityMark6[0]) <<
+                              "," << QString::number(intensityMark6[1]) <<
+                              "," << QString::number(intensityMark6[2])
+               ;
+
+   //-----------------------------------------------------
 
 
 

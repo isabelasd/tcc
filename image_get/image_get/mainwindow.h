@@ -31,6 +31,7 @@ public:
    // Mat image_gray;
     // mark 1 = central
     QGraphicsRectItem *mark1;
+    int intensity[3];
 
     // mark 2 = polegar , mark 3 = indicador... mark 6 = minimo
     QGraphicsRectItem *mark2;
