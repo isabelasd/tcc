@@ -5,6 +5,13 @@
 #include <QMessageBox>
 #include <QDir>
 
+
+// FIND NICE WAY TO DECLARE LOOKUP TABLE !!! PLEZ :)
+int R_channel[ SCALE_EL ]   = {   0,   2,   6,  18,  44,  90, 153, 216, 253, 244, 195, 131 } ;
+int G_channel[ SCALE_EL ]   = {  14,  36,  78, 138, 203, 248, 250, 209, 144,  82,  39,  16 } ;
+int B_channel[ SCALE_EL ]   = { 127, 189, 241, 254, 221, 159,  95,  47,  19,   6,   2,   0 } ;
+int temperature[ SCALE_EL ] = {  16,  18,  20,  22,  24,  26,  28,  30,  32,  34,  36,  38 } ;
+
 /* ------------------------------------------------------
  * MY FUNCTIONS
  * ----------------------------------------------------- */
@@ -13,7 +20,7 @@
 // top left coordinate : (topLeftX, topLeftY)
 // bottomRight coordinate : (bottomRightX, bottomRightY)
 
-int getIntensityGray (const Mat &image, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
+int MainWindow::getIntensityGray (const Mat &image, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
 {
     int intensity = 0;
     int aux = 0;
@@ -43,7 +50,7 @@ int getIntensityGray (const Mat &image, int topLeftX, int topLeftY, int bottomRi
 // top left coordinate : (topLeftX, topLeftY)
 // bottomRight coordinate : (bottomRightX, bottomRightY)
 
-void getIntensityBGR (const Mat &image, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY, int intensity_aux[])
+void MainWindow::getIntensityBGR (const Mat &image, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY, int intensity_aux[])
 {
     int el_count = 0 ;
     int intensityB = 0 ;
@@ -86,6 +93,57 @@ void getIntensityBGR (const Mat &image, int topLeftX, int topLeftY, int bottomRi
 
 }
 
+// function to get increment of a linear interpolation interval
+// inicial point : (x0,y0)
+// final point : (x1,y1)
+// temperature_precision : interpolate with 0.1 celcius degrees precision. this was choosen for us.
+
+double MainWindow::get_y_interp_increment( int x0, int x1, int y0, int y1, double temperature_precision )
+{
+    double increment = 0 ;
+    increment = temperature_precision * ( y1 - y0 ) / (x1 - x0) ;
+    return increment ;
+}
+
+
+// function to fill vector within a interval of the interpolation.
+// v1 : initial value inside the interval
+// v[] : vector to be filled
+// initial_pos : initial position to be included. as it is 0.1 precision, this is 0, 20, 40 ... until 220.
+// increment : increment on each interval, calculated using get_y_interp_increment
+
+void MainWindow::fill_vec( int v1, double v[], int initial_pos, double increment )
+{
+    int size = SCALE_INTERVAL * SCALE_PREC ;
+
+    v[ initial_pos ] = v1 ;
+    qDebug() << "\ninitial_pos= " << QString::number( initial_pos ) ;
+    for( int i = initial_pos + 1; i < ( initial_pos + size ); i++ ){
+        v[ i ] = v[ i - 1 ] + increment ;
+        //qDebug() << "\nel=" << QString::number( v[ i ] ) ;
+    }
+}
+
+// function to fill all the values of a interpolated vector.
+// temperature_vec : original temperature vector, without interpolation. this is used as x-axis (12 values)
+// colorVec : original vector to be interpolated. this is used as y-axis. it can be color or the temperature itself (12 values)
+// channel_dest : destination vector of the interpolated values. this is a bigger vector (220 values)
+
+void MainWindow::fill_Color_Channel( int temperature_vec[], int colorVec[], double channel_dest[] )
+{
+    int pos = 0 ;
+    double increment = 0 ;
+
+    // It is used SCALE_EL - 1 to account for the number of intervals within a color channel.
+    for( int i = 0; i < SCALE_EL - 1; i++ ) {
+        increment = get_y_interp_increment( temperature_vec[ i ], temperature_vec[ i + 1 ], colorVec[ i ], colorVec[ i + 1], 0.1 ) ;
+
+        fill_vec( colorVec[ i ], channel_dest, pos, increment ) ;
+
+        pos = pos + ( SCALE_INTERVAL * SCALE_PREC ) ;
+    }
+    channel_dest[ pos ] = colorVec[ SCALE_EL - 1 ] ;
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -166,8 +224,6 @@ void MainWindow::on_pushButton_clicked()
 
     file_name_cv  = file_name.toUtf8().constData() ;
 }
-
-
 
 
 void MainWindow::on_pushButton_2_clicked()
@@ -251,10 +307,7 @@ void MainWindow::on_pushButton_2_clicked()
     //--------------------------------------------
 
 
-    // function to get average
-    // --------------------------
-
-   // Gray scale
+   // section to get average : Grayscale color space
     /*
    int intensityMarkGray1 = 0;
    int intensityMarkGray2 = 0;
@@ -283,7 +336,7 @@ void MainWindow::on_pushButton_2_clicked()
    //-------------------------------------------------
 
    //-----------------------------------------------------
-   // BGR
+   // section to get average : BGR colorspace
 
    int intensityMark1[3] = {};
    int intensityMark2[3] = {};
@@ -351,58 +404,29 @@ void MainWindow::on_pushButton_2_clicked()
                               "," << QString::number(intensityMark6[2])
                ;
 
+
+   // getting temperature out of BGR
+
+   // interpolate each channel
+
+   fill_Color_Channel( temperature, R_channel,     R_channel_interp ) ;
+   fill_Color_Channel( temperature, G_channel,     G_channel_interp ) ;
+   fill_Color_Channel( temperature, B_channel,     B_channel_interp ) ;
+   fill_Color_Channel( temperature, temperature, temperature_interp ) ;
+
+   // debug section
+
+   /*
+   for( int i = 0; i < 221; i++ ) {
+       qDebug() << "\nG(" << QString::number( i ) << ") = " << QString::number( temperature_interp[ i ] ) ;
+   }
+   */
+   // ----------------------
+
+   // search for match
+
+
    //-----------------------------------------------------
-
-
-
-    /* -----------------------------------
-    // calculating average of a 4 connected-pixel value
-    int n = 5;
-    int intensity[n] = {};
-
-
-
-    // get value of a pixel (grayscale)
-    intensity[0] = image_gray.at<uchar>(Point(coordinates[0],coordinates[1]));
-    qDebug() << "\nx top left :" << QString::number(coordinates[0]) << " y: " << QString::number(coordinates[1]) << " color:" <<  QString::number(intensity[0]) ;
-
-    intensity[1] = image_gray.at<uchar>(Point(coordinates[0],coordinates[1]+1));
-    qDebug() << "\nx above :" << QString::number(coordinates[0]) << " y: " << QString::number(coordinates[1]+1) << " color:" <<  QString::number(intensity[1]) ;
-
-    intensity[2] = image_gray.at<uchar>(Point(coordinates[0]+1,coordinates[1]));
-    qDebug() << "\nx right :" << QString::number(coordinates[0]+1) << " y: " << QString::number(coordinates[1]) << " color:" <<  QString::number(intensity[2]) ;
-
-    intensity[3] = image_gray.at<uchar>(Point(coordinates[0],coordinates[1]-1));
-    qDebug() << "\nx bellow :" << QString::number(coordinates[0]) << " y: " << QString::number(coordinates[1]-1) << " color:" <<  QString::number(intensity[3]) ;
-
-    intensity[4] = image_gray.at<uchar>(Point(coordinates[0]-1,coordinates[1]));
-    qDebug() << "\nx left :" << QString::number(coordinates[0]-1) << " y: " << QString::number(coordinates[1]) << " color:" <<  QString::number(intensity[4]) ;
-
-    qDebug() << "\ncoordinates x :" << QString::number(coordinates[0]) << " y: " << QString::number(coordinates[2]);
-
-    double meanColor;
-
-    for (int i = 0 ; i < n ; i++)
-    {
-        meanColor += intensity[i];
-    }
-
-    meanColor = floor(meanColor/n);
-
-    qDebug() << "\nmedia : " << QString::number(meanColor) ;
-
-    ----------------------------------------------- */
-
-
-    // get value of a BGR pixel
-    /*
-    Vec3b intensityBGR = image.at<Vec3b>(Point(1,1));
-    uchar blue = intensityBGR.val[0];
-    uchar green = intensityBGR.val[1];
-    uchar red = intensityBGR.val[2];
-    qDebug() << "\n2: B" <<  blue << " G:" << green <<  " R:" << red;
-    */
-
 
 
 
