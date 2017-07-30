@@ -117,7 +117,6 @@ void MainWindow::fill_vec( int v1, double v[], int initial_pos, double increment
     int size = SCALE_INTERVAL * SCALE_PREC ;
 
     v[ initial_pos ] = v1 ;
-    qDebug() << "\ninitial_pos= " << QString::number( initial_pos ) ;
     for( int i = initial_pos + 1; i < ( initial_pos + size ); i++ ){
         v[ i ] = v[ i - 1 ] + increment ;
         //qDebug() << "\nel=" << QString::number( v[ i ] ) ;
@@ -144,6 +143,36 @@ void MainWindow::fill_Color_Channel( int temperature_vec[], int colorVec[], doub
     }
     channel_dest[ pos ] = colorVec[ SCALE_EL - 1 ] ;
 }
+
+int find_closest_match( int BGR[], double R_interp[], double G_interp[], double B_interp[] )
+{
+    double aux_vec_B[ ( ( SCALE_EL - 1 ) * SCALE_PREC * SCALE_INTERVAL ) + 1 ] = {} ;
+    double aux_vec_G[ ( ( SCALE_EL - 1 ) * SCALE_PREC * SCALE_INTERVAL ) + 1 ] = {} ;
+    double aux_vec_R[ ( ( SCALE_EL - 1 ) * SCALE_PREC * SCALE_INTERVAL ) + 1 ] = {} ;
+    double aux_vec_sum[ ( ( SCALE_EL - 1 ) * SCALE_PREC * SCALE_INTERVAL ) + 1 ] = {} ;
+
+    for ( int i = 0 ; i < ( ( SCALE_EL - 1 ) * SCALE_PREC * SCALE_INTERVAL ) + 1 ; i++)
+    {
+        aux_vec_B[i] = abs( BGR[0] - B_interp[i] ) ;
+        aux_vec_G[i] = abs( BGR[1] - G_interp[i] ) ;
+        aux_vec_R[i] = abs( BGR[2] - R_interp[i] ) ;
+        aux_vec_sum[i] = aux_vec_B[i] + aux_vec_G[i] + aux_vec_R[i] ;
+        //qDebug() << "\nDistB(" << QString::number(i) << ") = " << QString::number( aux_vec_R[i] ) << "= " << QString::number( BGR[2] )
+        //        << " - " << QString::number(R_interp[i]);
+    }
+
+    // Find minimum value within an array
+    int index = 0;
+
+    for( int i = 1; i < ( ( SCALE_EL - 1 ) * SCALE_PREC * SCALE_INTERVAL ) + 1; i++)
+    {
+        if ( aux_vec_sum[i] < aux_vec_sum[index] )
+        index = i ;
+    }
+
+    return index ;
+}
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -345,9 +374,9 @@ void MainWindow::on_pushButton_2_clicked()
    int intensityMark5[3] = {};
    int intensityMark6[3] = {};
 
-   intensity[0] = 0 ;
-   intensity[1] = 0 ;
-   intensity[2] = 0 ;
+   intensity[0] = 0 ; // B
+   intensity[1] = 0 ; // G
+   intensity[2] = 0 ; // R
 
    getIntensityBGR(image, coordinates[0],coordinates[1],coordinates[2],coordinates[3], intensity);
    intensityMark1[0] = intensity[0];
@@ -416,15 +445,28 @@ void MainWindow::on_pushButton_2_clicked()
 
    // debug section
 
-   /*
+    /*
    for( int i = 0; i < 221; i++ ) {
-       qDebug() << "\nG(" << QString::number( i ) << ") = " << QString::number( temperature_interp[ i ] ) ;
-   }
-   */
+       qDebug() << "\nB(" << QString::number( i ) << ") = " << QString::number( B_channel_interp[ i ] ) ;
+   }*/
+
    // ----------------------
 
    // search for match
 
+    int index_min1 = find_closest_match(intensityMark1, R_channel_interp, G_channel_interp, B_channel_interp ) ;
+    int index_min2 = find_closest_match(intensityMark2, R_channel_interp, G_channel_interp, B_channel_interp ) ;
+    int index_min3 = find_closest_match(intensityMark3, R_channel_interp, G_channel_interp, B_channel_interp ) ;
+    int index_min4 = find_closest_match(intensityMark4, R_channel_interp, G_channel_interp, B_channel_interp ) ;
+    int index_min5 = find_closest_match(intensityMark5, R_channel_interp, G_channel_interp, B_channel_interp ) ;
+    int index_min6 = find_closest_match(intensityMark6, R_channel_interp, G_channel_interp, B_channel_interp ) ;
+
+    qDebug() << "\nIndex = " << QString::number(index_min1) << "  Approx Temp = " << QString::number(temperature_interp[index_min1]) ;
+    qDebug() << "\nIndex = " << QString::number(index_min2) << "  Approx Temp = " << QString::number(temperature_interp[index_min2]) ;
+    qDebug() << "\nIndex = " << QString::number(index_min3) << "  Approx Temp = " << QString::number(temperature_interp[index_min3]) ;
+    qDebug() << "\nIndex = " << QString::number(index_min4) << "  Approx Temp = " << QString::number(temperature_interp[index_min4]) ;
+    qDebug() << "\nIndex = " << QString::number(index_min5) << "  Approx Temp = " << QString::number(temperature_interp[index_min5]) ;
+    qDebug() << "\nIndex = " << QString::number(index_min6) << "  Approx Temp = " << QString::number(temperature_interp[index_min6]) ;
 
    //-----------------------------------------------------
 

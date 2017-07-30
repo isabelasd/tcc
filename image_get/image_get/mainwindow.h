@@ -36,10 +36,10 @@ public:
     // variables - put this as private later
     int intensity[3];
     double coordinates[24];
-    double R_channel_interp[ ( SCALE_EL - 1 ) * SCALE_PREC * SCALE_INTERVAL ] ;
-    double G_channel_interp[ ( SCALE_EL - 1 ) * SCALE_PREC * SCALE_INTERVAL ] ;
-    double B_channel_interp[ ( SCALE_EL - 1 ) * SCALE_PREC * SCALE_INTERVAL ] ;
-    double temperature_interp[ ( SCALE_EL - 1 ) * SCALE_PREC * SCALE_INTERVAL ] ;
+    double R_channel_interp[   ( ( SCALE_EL - 1 ) * SCALE_PREC * SCALE_INTERVAL ) + 1 ] ;
+    double G_channel_interp[   ( ( SCALE_EL - 1 ) * SCALE_PREC * SCALE_INTERVAL ) + 1 ] ;
+    double B_channel_interp[   ( ( SCALE_EL - 1 ) * SCALE_PREC * SCALE_INTERVAL ) + 1 ] ;
+    double temperature_interp[ ( ( SCALE_EL - 1 ) * SCALE_PREC * SCALE_INTERVAL ) + 1 ] ;
 
     // my functions
     int getIntensityGray (const Mat &image, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY) ;
