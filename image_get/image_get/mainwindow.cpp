@@ -183,8 +183,29 @@ MainWindow::MainWindow(QWidget *parent) :
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
 
-    QGraphicsEllipseItem mark1;
+    xc = 10;
+    yc = 30;
+    wc = 8 ;
+    hc = 8 ;
 
+    ui ->spinBox -> blockSignals(true);
+    ui ->spinBox ->setMinimum(1);
+    ui ->spinBox ->setMaximum(20);
+    ui ->spinBox ->setValue(8);
+    ui ->spinBox -> blockSignals(false);
+
+    xf = 30;
+    yf = 30;
+    wf = 4 ;
+    hf = 4 ;
+
+    ui ->spinBox_2 -> blockSignals(true);
+    ui ->spinBox_2 ->setMinimum(1);
+    ui ->spinBox_2 ->setMaximum(20);
+    ui ->spinBox_2 ->setValue(4);
+    ui ->spinBox_2 -> blockSignals(false);
+
+  // conect(spinBox,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),)
 
 }
 
@@ -217,22 +238,12 @@ void MainWindow::on_pushButton_clicked()
     QPen blackpen(Qt::black);
     blackpen.setWidth(0);
 
-    qreal xc, yc, wc, hc ;
-    xc = 10;
-    yc = 30;
-    wc = 8 ;
-    hc = 8;
-
     mark1 = scene ->addRect(xc,yc,wc,hc,blackpen);
     mark1->setFlag( QGraphicsItem::ItemIsMovable );
 
 
     // fingers markers
-    qreal xf, yf, wf, hf ;
-    xf = 30;
-    yf = 30;
-    wf = 4 ;
-    hf = 4;
+
 
     // dedao
     mark2 = scene ->addRect(xf,yf,wf,hf,blackpen);
@@ -472,4 +483,27 @@ void MainWindow::on_pushButton_2_clicked()
 
 
 
+}
+
+
+void MainWindow::on_spinBox_valueChanged(int arg1)
+{
+    //mark1 -> setRect( xc , yc , 12, 12);
+    wc = arg1 ;
+    hc = arg1 ;
+    //qDebug() << "\nwc = " << QString::number(wc) ;
+    mark1 -> setRect(xc , yc , wc, hc) ;
+}
+
+
+
+void MainWindow::on_spinBox_2_valueChanged(int arg1)
+{
+    wf = arg1 ;
+    hf = arg1 ;
+    mark2 -> setRect(xf , yf , wf, hf) ;
+    mark3 -> setRect(xf+20 , yf , wf, hf) ;
+    mark4 -> setRect(xf+40 , yf , wf, hf) ;
+    mark5 -> setRect(xf+60 , yf , wf, hf) ;
+    mark6 -> setRect(xf+80 , yf , wf, hf) ;
 }

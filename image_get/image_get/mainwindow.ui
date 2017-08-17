@@ -37,24 +37,11 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>820</x>
-      <y>120</y>
-      <width>61</width>
-      <height>171</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>teste</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="pushButton_2">
     <property name="geometry">
      <rect>
-      <x>820</x>
-      <y>450</y>
+      <x>830</x>
+      <y>310</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -62,6 +49,24 @@
     <property name="text">
      <string>teste</string>
     </property>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>830</x>
+      <y>120</y>
+      <width>61</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QSpinBox" name="spinBox"/>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="spinBox_2"/>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">

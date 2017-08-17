@@ -6,6 +6,7 @@
 #include <QGraphicsObject>
 #include <QtCore>
 #include <QtGui>
+#include <QSpinBox>
 
 #define SCALE_INTERVAL 2
 #define SCALE_PREC 10 // Decimal com 1 casa
@@ -48,6 +49,27 @@ public:
     void fill_vec( int v1, double v[], int initial_pos, double increment ) ;
     void fill_Color_Channel( int temperature_vec[], int colorVec[], double channel_dest[] ) ;
 
+     qreal xc, yc, wc, hc ;
+
+     qreal xf, yf, wf, hf ;
+
+
+
+    ~MainWindow();
+
+private slots:
+    void on_pushButton_clicked();
+
+    void on_pushButton_2_clicked();
+
+
+    void on_spinBox_valueChanged(int arg1);
+
+    void on_spinBox_2_valueChanged(int arg1);
+
+private:
+    Ui::MainWindow *ui;
+    QGraphicsScene *scene;
 
     // markers
     // mark 1 = central
@@ -58,16 +80,7 @@ public:
     QGraphicsRectItem *mark4;
     QGraphicsRectItem *mark5;
     QGraphicsRectItem *mark6;
-    ~MainWindow();
 
-private slots:
-    void on_pushButton_clicked();
-
-    void on_pushButton_2_clicked();
-
-private:
-    Ui::MainWindow *ui;
-    QGraphicsScene *scene;
 };
 
 #endif // MAINWINDOW_H
