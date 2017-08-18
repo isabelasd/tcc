@@ -3,7 +3,6 @@
 #include <QPixmap>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QDir>
 
 
 // FIND NICE WAY TO DECLARE LOOKUP TABLE !!! PLEZ :)
@@ -205,6 +204,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui ->spinBox_2 ->setValue(4);
     ui ->spinBox_2 -> blockSignals(false);
 
+    image_number = 0 ;
+
   // conect(spinBox,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),)
 
 }
@@ -216,9 +217,28 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    QString filter = "Todos os arquivos (*.*) ;; Imagem PNG (*.png)" ;
-    QString file_name = QFileDialog::getOpenFileName( this,"Abrir um arquivo",QDir::homePath(),filter ) ;
-   // QMessageBox::information( this,"..",file_name ) ;
+
+    dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+                                                    QDir::homePath(),
+                                                    QFileDialog::ShowDirsOnly
+                                                    | QFileDialog::DontResolveSymlinks);
+
+    qDebug() << dir ;
+
+    QDir image_folder(dir);
+    image_folder.setNameFilters( QStringList() << "*.png" ) ;
+    image_list = image_folder.entryList() ;
+    for (int i = 0 ; i < image_list.size() ; i++)
+    {
+        qDebug() << "\nList(" << i << "):" << image_list.at(i) ;
+    }
+
+    QString first_image = dir+"/"+image_list.at(1) ;
+
+    qDebug() << "\nprimeiro path:" << first_image ;
+
+    //----------
+
 
     // open image to label  - not used anymore //
     /* QPixmap pix1(file_name) ;
@@ -228,7 +248,7 @@ void MainWindow::on_pushButton_clicked()
 
     // scene begin
     // add image
-    scene->addPixmap(file_name);
+    scene->addPixmap(first_image);
 
     // add markers
     // markers are displayed in increasing number sequence, from left to right
@@ -261,8 +281,8 @@ void MainWindow::on_pushButton_clicked()
     mark6 = scene ->addRect(xf+80,yf,wf,hf,blackpen);
     mark6->setFlag( QGraphicsItem::ItemIsMovable );
 
-
-    file_name_cv  = file_name.toUtf8().constData() ;
+    path_att = dir + "/" + image_list.at(image_number);
+    path_att_cv  = path_att.toUtf8().constData() ;
 }
 
 
@@ -318,7 +338,7 @@ void MainWindow::on_pushButton_2_clicked()
                          */
 
     // read image (using the path)
-    image = imread( file_name_cv );
+    image = imread( path_att_cv );
 
     // create image window
    // namedWindow("Foto");
@@ -457,8 +477,6 @@ void MainWindow::on_pushButton_2_clicked()
 
    //-----------------------------------------------------
 
-
-
 }
 
 
@@ -482,4 +500,100 @@ void MainWindow::on_spinBox_2_valueChanged(int arg1)
     mark4 -> setRect(xf+40 , yf , wf, hf) ;
     mark5 -> setRect(xf+60 , yf , wf, hf) ;
     mark6 -> setRect(xf+80 , yf , wf, hf) ;
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    QDir image_folder(dir);
+    image_folder.setNameFilters( QStringList() << "*.png" ) ;
+
+    image_number++ ;
+
+    if( image_number > image_list.size() - 1 )
+    {
+        image_number = 0 ;
+    }
+    // updates path
+    path_att = dir + "/" + image_list.at(image_number);
+    path_att_cv  = path_att.toUtf8().constData() ;
+
+    // recreate pixmap
+    scene -> addPixmap( path_att );
+
+    QPen blackpen(Qt::black);
+    blackpen.setWidth(0);
+    // central marker
+    mark1 = scene ->addRect(xc,yc,wc,hc,blackpen);
+    mark1->setFlag( QGraphicsItem::ItemIsMovable );
+    // fingers markers
+    // dedao
+    mark2 = scene ->addRect(xf,yf,wf,hf,blackpen);
+    mark2->setFlag( QGraphicsItem::ItemIsMovable );
+    // indicador
+    mark3 = scene ->addRect(xf+20,yf,wf,hf,blackpen);
+    mark3->setFlag( QGraphicsItem::ItemIsMovable );
+    // medio
+    mark4 = scene ->addRect(xf+40,yf,wf,hf,blackpen);
+    mark4->setFlag( QGraphicsItem::ItemIsMovable );
+    // anelar
+    mark5 = scene ->addRect(xf+60,yf,wf,hf,blackpen);
+    mark5->setFlag( QGraphicsItem::ItemIsMovable );
+    // minimo
+    mark6 = scene ->addRect(xf+80,yf,wf,hf,blackpen);
+    mark6->setFlag( QGraphicsItem::ItemIsMovable );
+    /*
+    for (int i = 0 ; i < image_list.size() ; i++)
+    {
+        qDebug() << "\nList(" << i << "):" << image_list.at(i) ;
+    }
+
+    QString first_el = dir+"/"+image_list.at(1) ;
+
+    qDebug() << "\nprimeiro path:" << first_el ;
+*/
+
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    QDir image_folder(dir);
+    image_folder.setNameFilters( QStringList() << "*.png" ) ;
+
+    image_number-- ;
+
+    if( image_number < 0 )
+    {
+        image_number = image_list.size() - 1 ;
+    }
+
+    // updates path
+    path_att = dir + "/" + image_list.at(image_number);
+    path_att_cv  = path_att.toUtf8().constData() ;
+
+    // recreate pixmap
+    scene -> addPixmap( path_att );
+
+    QPen blackpen(Qt::black);
+    blackpen.setWidth(0);
+    // central marker
+    mark1 = scene ->addRect(xc,yc,wc,hc,blackpen);
+    mark1->setFlag( QGraphicsItem::ItemIsMovable );
+    // fingers markers
+    // dedao
+    mark2 = scene ->addRect(xf,yf,wf,hf,blackpen);
+    mark2->setFlag( QGraphicsItem::ItemIsMovable );
+    // indicador
+    mark3 = scene ->addRect(xf+20,yf,wf,hf,blackpen);
+    mark3->setFlag( QGraphicsItem::ItemIsMovable );
+    // medio
+    mark4 = scene ->addRect(xf+40,yf,wf,hf,blackpen);
+    mark4->setFlag( QGraphicsItem::ItemIsMovable );
+    // anelar
+    mark5 = scene ->addRect(xf+60,yf,wf,hf,blackpen);
+    mark5->setFlag( QGraphicsItem::ItemIsMovable );
+    // minimo
+    mark6 = scene ->addRect(xf+80,yf,wf,hf,blackpen);
+    mark6->setFlag( QGraphicsItem::ItemIsMovable );
+
+
 }

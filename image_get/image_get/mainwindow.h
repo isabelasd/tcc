@@ -7,6 +7,8 @@
 #include <QtCore>
 #include <QtGui>
 #include <QSpinBox>
+#include <QDir>
+#include <QGraphicsPixmapItem>
 
 #define SCALE_INTERVAL 2
 #define SCALE_PREC 10 // Decimal com 1 casa
@@ -31,8 +33,13 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    string file_name_cv;
+    string path_att_cv;
     Mat image;
+
+    QStringList image_list;
+    QString dir;
+    QString path_att;
+    int image_number ;
 
     // variables - put this as private later
     int intensity[3];
@@ -66,6 +73,10 @@ private slots:
     void on_spinBox_valueChanged(int arg1);
 
     void on_spinBox_2_valueChanged(int arg1);
+
+    void on_pushButton_3_clicked();
+
+    void on_pushButton_4_clicked();
 
 private:
     Ui::MainWindow *ui;
