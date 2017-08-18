@@ -321,7 +321,7 @@ void MainWindow::on_pushButton_2_clicked()
     image = imread( file_name_cv );
 
     // create image window
-    namedWindow("Foto");
+   // namedWindow("Foto");
 
     // draw markers    
     rectangle(image,Point(coordinates[0],coordinates[1]), Point(coordinates[2],coordinates[3]), Scalar(0,0,0), 1);
@@ -332,7 +332,7 @@ void MainWindow::on_pushButton_2_clicked()
     rectangle(image,Point(coordinates[20],coordinates[21]), Point(coordinates[22],coordinates[23]), Scalar(0,0,0), 1);
 
     //show image -> image loaded in BGR format
-    imshow("Foto",image);
+   // imshow("Foto",image);
 
      // -----------------------
     // Gray scale
@@ -342,7 +342,7 @@ void MainWindow::on_pushButton_2_clicked()
     // comparing to MATLAB scale, this is the most similar one
     cvtColor(image,image_gray,CV_BGR2GRAY);
 
-    imshow("Foto gray",image_gray);
+    //imshow("Foto gray",image_gray);
 
     //--------------------------------------------
 
@@ -393,56 +393,31 @@ void MainWindow::on_pushButton_2_clicked()
    intensityMark1[0] = intensity[0];
    intensityMark1[1] = intensity[1];
    intensityMark1[2] = intensity[2];
-   qDebug() << "\nintensidade 1 : " << QString::number(intensityMark1[0]) <<
-                              "," << QString::number(intensityMark1[1]) <<
-                              "," << QString::number(intensityMark1[2])
-               ;
 
    getIntensityBGR(image, coordinates[4],coordinates[5],coordinates[6],coordinates[7], intensity);
    intensityMark2[0] = intensity[0];
    intensityMark2[1] = intensity[1];
    intensityMark2[2] = intensity[2];
-   qDebug() << "\nintensidade 2 : " << QString::number(intensityMark2[0]) <<
-                              "," << QString::number(intensityMark2[1]) <<
-                              "," << QString::number(intensityMark2[2])
-               ;
 
    getIntensityBGR(image, coordinates[8],coordinates[9],coordinates[10],coordinates[11], intensity);
    intensityMark3[0] = intensity[0];
    intensityMark3[1] = intensity[1];
    intensityMark3[2] = intensity[2];
-   qDebug() << "\nintensidade 3 : " << QString::number(intensityMark3[0]) <<
-                              "," << QString::number(intensityMark3[1]) <<
-                              "," << QString::number(intensityMark3[2])
-               ;
 
    getIntensityBGR(image, coordinates[12],coordinates[13],coordinates[14],coordinates[15], intensity);
    intensityMark4[0] = intensity[0];
    intensityMark4[1] = intensity[1];
    intensityMark4[2] = intensity[2];
-   qDebug() << "\nintensidade 4 : " << QString::number(intensityMark4[0]) <<
-                              "," << QString::number(intensityMark4[1]) <<
-                              "," << QString::number(intensityMark4[2])
-               ;
 
    getIntensityBGR(image, coordinates[16],coordinates[17],coordinates[18],coordinates[19], intensity);
    intensityMark5[0] = intensity[0];
    intensityMark5[1] = intensity[1];
    intensityMark5[2] = intensity[2];
-   qDebug() << "\nintensidade 5 : " << QString::number(intensityMark5[0]) <<
-                              "," << QString::number(intensityMark5[1]) <<
-                              "," << QString::number(intensityMark5[2])
-               ;
 
    getIntensityBGR(image, coordinates[20],coordinates[21],coordinates[22],coordinates[23], intensity);
    intensityMark6[0] = intensity[0];
    intensityMark6[1] = intensity[1];
    intensityMark6[2] = intensity[2];
-
-   qDebug() << "\nintensidade 6 : " << QString::number(intensityMark6[0]) <<
-                              "," << QString::number(intensityMark6[1]) <<
-                              "," << QString::number(intensityMark6[2])
-               ;
 
 
    // getting temperature out of BGR
@@ -472,12 +447,13 @@ void MainWindow::on_pushButton_2_clicked()
     int index_min5 = find_closest_match(intensityMark5, R_channel_interp, G_channel_interp, B_channel_interp ) ;
     int index_min6 = find_closest_match(intensityMark6, R_channel_interp, G_channel_interp, B_channel_interp ) ;
 
-    qDebug() << "\nIndex = " << QString::number(index_min1) << "  Approx Temp = " << QString::number(temperature_interp[index_min1]) ;
-    qDebug() << "\nIndex = " << QString::number(index_min2) << "  Approx Temp = " << QString::number(temperature_interp[index_min2]) ;
-    qDebug() << "\nIndex = " << QString::number(index_min3) << "  Approx Temp = " << QString::number(temperature_interp[index_min3]) ;
-    qDebug() << "\nIndex = " << QString::number(index_min4) << "  Approx Temp = " << QString::number(temperature_interp[index_min4]) ;
-    qDebug() << "\nIndex = " << QString::number(index_min5) << "  Approx Temp = " << QString::number(temperature_interp[index_min5]) ;
-    qDebug() << "\nIndex = " << QString::number(index_min6) << "  Approx Temp = " << QString::number(temperature_interp[index_min6]) ;
+    ui->label_11->setText(QString::number(temperature_interp[index_min1] ) + " °C" ) ;
+    ui->label_12->setText(QString::number(temperature_interp[index_min2] ) + " °C" ) ;
+    ui->label_13->setText(QString::number(temperature_interp[index_min3] ) + " °C" ) ;
+    ui->label_14->setText(QString::number(temperature_interp[index_min4] ) + " °C" ) ;
+    ui->label_15->setText(QString::number(temperature_interp[index_min5] ) + " °C" ) ;
+    ui->label_16->setText(QString::number(temperature_interp[index_min6] ) + " °C" ) ;
+
 
    //-----------------------------------------------------
 
