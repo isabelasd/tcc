@@ -13,6 +13,8 @@
 #define SCALE_INTERVAL 2
 #define SCALE_PREC 10 // Decimal com 1 casa
 #define SCALE_EL 12
+#define MARKERS_NUMBER 6
+#define PICTURE_NUMBER 12
 
 /************* SUPER FUCKING IMPORTANT *************/
 #include <opencv2/core/core.hpp>
@@ -49,12 +51,18 @@ public:
     double B_channel_interp[   ( ( SCALE_EL - 1 ) * SCALE_PREC * SCALE_INTERVAL ) + 1 ] ;
     double temperature_interp[ ( ( SCALE_EL - 1 ) * SCALE_PREC * SCALE_INTERVAL ) + 1 ] ;
 
+    int x_markers [ (MARKERS_NUMBER * PICTURE_NUMBER) ];
+    int y_markers [ (MARKERS_NUMBER * PICTURE_NUMBER) ];
+    double temp_values [ (MARKERS_NUMBER * PICTURE_NUMBER) ];
+
     // my functions
     int getIntensityGray (const Mat &image, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY) ;
     void getIntensityBGR (const Mat &image, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY, int intensity_aux[]) ;
     double get_y_interp_increment( int x0, int x1, int y0, int y1, double temperature_precision ) ;
     void fill_vec( int v1, double v[], int initial_pos, double increment ) ;
     void fill_Color_Channel( int temperature_vec[], int colorVec[], double channel_dest[] ) ;
+    void set_mark_values(int index_image, int x_values [], int y_values [] ) ;
+
 
      qreal xc, yc, wc, hc ;
 
@@ -65,18 +73,18 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_clicked();
-
-    void on_pushButton_2_clicked();
-
 
     void on_spinBox_valueChanged(int arg1);
 
     void on_spinBox_2_valueChanged(int arg1);
 
-    void on_pushButton_3_clicked();
+    void on_anterior_clicked();
 
-    void on_pushButton_4_clicked();
+    void on_proximo_clicked();
+
+    void on_diretorio_clicked();
+
+    void on_temperature_clicked();
 
 private:
     Ui::MainWindow *ui;

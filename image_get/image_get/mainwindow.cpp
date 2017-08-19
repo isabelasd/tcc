@@ -173,6 +173,26 @@ int find_closest_match( int BGR[], double R_interp[], double G_interp[], double 
 }
 
 
+void MainWindow::set_mark_values(int index_image, int x_values [], int y_values [] )
+{
+   x_values[index_image*6]   = mark1 -> sceneBoundingRect().topLeft().x();
+   x_values[index_image*6+1] = mark2 -> sceneBoundingRect().topLeft().x();
+   x_values[index_image*6+2] = mark3 -> sceneBoundingRect().topLeft().x();
+   x_values[index_image*6+3] = mark4 -> sceneBoundingRect().topLeft().x();
+   x_values[index_image*6+4] = mark5 -> sceneBoundingRect().topLeft().x();
+   x_values[index_image*6+5] = mark6 -> sceneBoundingRect().topLeft().x();
+
+   y_values[index_image*6]   = mark1 -> sceneBoundingRect().topLeft().y();
+   y_values[index_image*6+1] = mark2 -> sceneBoundingRect().topLeft().y();
+   y_values[index_image*6+2] = mark3 -> sceneBoundingRect().topLeft().y();
+   y_values[index_image*6+3] = mark4 -> sceneBoundingRect().topLeft().y();
+   y_values[index_image*6+4] = mark5 -> sceneBoundingRect().topLeft().y();
+   y_values[index_image*6+5] = mark6 -> sceneBoundingRect().topLeft().y();
+
+}
+
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -182,21 +202,22 @@ MainWindow::MainWindow(QWidget *parent) :
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
 
+    // initialize variables
     xc = 10;
     yc = 30;
     wc = 8 ;
     hc = 8 ;
+
+    xf = 30;
+    yf = 30;
+    wf = 4 ;
+    hf = 4 ;
 
     ui ->spinBox -> blockSignals(true);
     ui ->spinBox ->setMinimum(1);
     ui ->spinBox ->setMaximum(20);
     ui ->spinBox ->setValue(8);
     ui ->spinBox -> blockSignals(false);
-
-    xf = 30;
-    yf = 30;
-    wf = 4 ;
-    hf = 4 ;
 
     ui ->spinBox_2 -> blockSignals(true);
     ui ->spinBox_2 ->setMinimum(1);
@@ -206,7 +227,21 @@ MainWindow::MainWindow(QWidget *parent) :
 
     image_number = 0 ;
 
-  // conect(spinBox,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),)
+    int increment = 20 ;
+    int inicial_pos = 10 ;
+
+    for (int i = 0 ; i < (MARKERS_NUMBER * PICTURE_NUMBER) ; i ++)
+    {
+             if (i % 6 == 0) x_markers[i] = inicial_pos ;
+        else if (i % 6 == 1) x_markers[i] = inicial_pos + 1 * increment;
+        else if (i % 6 == 2) x_markers[i] = inicial_pos + 2 * increment;
+        else if (i % 6 == 3) x_markers[i] = inicial_pos + 3 * increment;
+        else if (i % 6 == 4) x_markers[i] = inicial_pos + 4 * increment;
+        else if (i % 6 == 5) x_markers[i] = inicial_pos + 5 * increment;
+
+        y_markers[i] = 30 ;
+        temp_values[i] = 0 ;
+    }
 
 }
 
@@ -215,7 +250,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_diretorio_clicked()
 {
 
     dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
@@ -286,7 +321,7 @@ void MainWindow::on_pushButton_clicked()
 }
 
 
-void MainWindow::on_pushButton_2_clicked()
+void MainWindow::on_temperature_clicked()
 {
 
     coordinates[0]  = mark1 -> sceneBoundingRect().topLeft().x();
@@ -474,39 +509,78 @@ void MainWindow::on_pushButton_2_clicked()
     ui->label_15->setText(QString::number(temperature_interp[index_min5] ) + " °C" ) ;
     ui->label_16->setText(QString::number(temperature_interp[index_min6] ) + " °C" ) ;
 
+    // save temperatures os an array.
+    // afterwards, this array will be used to export the data into a xml file.
+    temp_values[image_number*6]   = temperature_interp[index_min1];
+    temp_values[image_number*6+1] = temperature_interp[index_min2];
+    temp_values[image_number*6+2] = temperature_interp[index_min3];
+    temp_values[image_number*6+3] = temperature_interp[index_min4];
+    temp_values[image_number*6+4] = temperature_interp[index_min5];
+    temp_values[image_number*6+5] = temperature_interp[index_min6];
+
+    // set mark x and y values
+    set_mark_values(image_number, x_markers, y_markers) ;
+
+    /*
+    qDebug() << "\nintensidade 1 :" << QString::number(temp_values[image_number*6]) <<
+                "\nintensidade 2 :" << QString::number(temp_values[image_number*6+1]) <<
+                "\nintensidade 3 :" << QString::number(temp_values[image_number*6+2]) <<
+                "\nintensidade 4 :" << QString::number(temp_values[image_number*6+3]) <<
+                "\nintensidade 5 :" << QString::number(temp_values[image_number*6+4]) <<
+                "\nintensidade 6 :" << QString::number(temp_values[image_number*6+5])
+                ;
+    qDebug() << "\nx 1 :" << QString::number(x_markers[image_number*6]) <<
+                "\nx 2 :" << QString::number(x_markers[image_number*6+1]) <<
+                "\nx 3 :" << QString::number(x_markers[image_number*6+2]) <<
+                "\nx 4 :" << QString::number(x_markers[image_number*6+3]) <<
+                "\nx 5 :" << QString::number(x_markers[image_number*6+4]) <<
+                "\nx 6 :" << QString::number(x_markers[image_number*6+5])
+                ;
+
+    qDebug() << "\ny 1 :" << QString::number(y_markers[image_number*6]) <<
+                "\ny 2 :" << QString::number(y_markers[image_number*6+1]) <<
+                "\ny 3 :" << QString::number(y_markers[image_number*6+2]) <<
+                "\ny 4 :" << QString::number(y_markers[image_number*6+3]) <<
+                "\ny 5 :" << QString::number(y_markers[image_number*6+4]) <<
+                "\ny 6 :" << QString::number(y_markers[image_number*6+5])
+                ;
+
+
+    */
+
 
    //-----------------------------------------------------
 
 }
 
-
+//spinbox used for bigger marker. updates its size
 void MainWindow::on_spinBox_valueChanged(int arg1)
 {
-    //mark1 -> setRect( xc , yc , 12, 12);
     wc = arg1 ;
     hc = arg1 ;
-    //qDebug() << "\nwc = " << QString::number(wc) ;
-    mark1 -> setRect(xc , yc , wc, hc) ;
+    mark1 -> setRect(x_markers[image_number*6],y_markers[image_number*6] , wc, hc) ;
 }
 
 
-
+//spinbox used for smaller markers. updates the size of the markers
 void MainWindow::on_spinBox_2_valueChanged(int arg1)
 {
     wf = arg1 ;
     hf = arg1 ;
-    mark2 -> setRect(xf , yf , wf, hf) ;
-    mark3 -> setRect(xf+20 , yf , wf, hf) ;
-    mark4 -> setRect(xf+40 , yf , wf, hf) ;
-    mark5 -> setRect(xf+60 , yf , wf, hf) ;
-    mark6 -> setRect(xf+80 , yf , wf, hf) ;
+    mark2 -> setRect(x_markers[image_number*6+1],y_markers[image_number*6+1] , wf, hf) ;
+    mark3 -> setRect(x_markers[image_number*6+2],y_markers[image_number*6+2] , wf, hf) ;
+    mark4 -> setRect(x_markers[image_number*6+3],y_markers[image_number*6+3] , wf, hf) ;
+    mark5 -> setRect(x_markers[image_number*6+4],y_markers[image_number*6+4] , wf, hf) ;
+    mark6 -> setRect(x_markers[image_number*6+5],y_markers[image_number*6+5] , wf, hf) ;
 }
 
-void MainWindow::on_pushButton_3_clicked()
+void MainWindow::on_proximo_clicked()
 {
+    // gets the original path
     QDir image_folder(dir);
     image_folder.setNameFilters( QStringList() << "*.png" ) ;
 
+    // update position of the list
     image_number++ ;
 
     if( image_number > image_list.size() - 1 )
@@ -523,23 +597,23 @@ void MainWindow::on_pushButton_3_clicked()
     QPen blackpen(Qt::black);
     blackpen.setWidth(0);
     // central marker
-    mark1 = scene ->addRect(xc,yc,wc,hc,blackpen);
+    mark1 = scene ->addRect(x_markers[image_number*6],y_markers[image_number*6],wc,hc,blackpen);
     mark1->setFlag( QGraphicsItem::ItemIsMovable );
     // fingers markers
     // dedao
-    mark2 = scene ->addRect(xf,yf,wf,hf,blackpen);
+    mark2 = scene ->addRect(x_markers[image_number*6+1],y_markers[image_number*6+1],wf,hf,blackpen);
     mark2->setFlag( QGraphicsItem::ItemIsMovable );
     // indicador
-    mark3 = scene ->addRect(xf+20,yf,wf,hf,blackpen);
+    mark3 = scene ->addRect(x_markers[image_number*6+2],y_markers[image_number*6+2],wf,hf,blackpen);
     mark3->setFlag( QGraphicsItem::ItemIsMovable );
     // medio
-    mark4 = scene ->addRect(xf+40,yf,wf,hf,blackpen);
+    mark4 = scene ->addRect(x_markers[image_number*6+3],y_markers[image_number*6+3],wf,hf,blackpen);
     mark4->setFlag( QGraphicsItem::ItemIsMovable );
     // anelar
-    mark5 = scene ->addRect(xf+60,yf,wf,hf,blackpen);
+    mark5 = scene ->addRect(x_markers[image_number*6+4],y_markers[image_number*6+4],wf,hf,blackpen);
     mark5->setFlag( QGraphicsItem::ItemIsMovable );
     // minimo
-    mark6 = scene ->addRect(xf+80,yf,wf,hf,blackpen);
+    mark6 = scene ->addRect(x_markers[image_number*6+5],y_markers[image_number*6+5],wf,hf,blackpen);
     mark6->setFlag( QGraphicsItem::ItemIsMovable );
     /*
     for (int i = 0 ; i < image_list.size() ; i++)
@@ -554,10 +628,13 @@ void MainWindow::on_pushButton_3_clicked()
 
 }
 
-void MainWindow::on_pushButton_4_clicked()
+void MainWindow::on_anterior_clicked()
 {
+    // gets the original path
     QDir image_folder(dir);
     image_folder.setNameFilters( QStringList() << "*.png" ) ;
+
+    // decrement position of image list
 
     image_number-- ;
 
@@ -576,24 +653,24 @@ void MainWindow::on_pushButton_4_clicked()
     QPen blackpen(Qt::black);
     blackpen.setWidth(0);
     // central marker
-    mark1 = scene ->addRect(xc,yc,wc,hc,blackpen);
+    mark1 = scene ->addRect(x_markers[image_number*6],y_markers[image_number*6],wc,hc,blackpen);
     mark1->setFlag( QGraphicsItem::ItemIsMovable );
     // fingers markers
     // dedao
-    mark2 = scene ->addRect(xf,yf,wf,hf,blackpen);
+    mark2 = scene ->addRect(x_markers[image_number*6+1],y_markers[image_number*6+1],wf,hf,blackpen);
     mark2->setFlag( QGraphicsItem::ItemIsMovable );
     // indicador
-    mark3 = scene ->addRect(xf+20,yf,wf,hf,blackpen);
+    mark3 = scene ->addRect(x_markers[image_number*6+2],y_markers[image_number*6+2],wf,hf,blackpen);
     mark3->setFlag( QGraphicsItem::ItemIsMovable );
     // medio
-    mark4 = scene ->addRect(xf+40,yf,wf,hf,blackpen);
+    mark4 = scene ->addRect(x_markers[image_number*6+3],y_markers[image_number*6+3],wf,hf,blackpen);
     mark4->setFlag( QGraphicsItem::ItemIsMovable );
     // anelar
-    mark5 = scene ->addRect(xf+60,yf,wf,hf,blackpen);
+    mark5 = scene ->addRect(x_markers[image_number*6+4],y_markers[image_number*6+4],wf,hf,blackpen);
     mark5->setFlag( QGraphicsItem::ItemIsMovable );
     // minimo
-    mark6 = scene ->addRect(xf+80,yf,wf,hf,blackpen);
+    mark6 = scene ->addRect(x_markers[image_number*6+5],y_markers[image_number*6+5],wf,hf,blackpen);
     mark6->setFlag( QGraphicsItem::ItemIsMovable );
 
-
 }
+

@@ -24,7 +24,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="temperature">
     <property name="geometry">
      <rect>
       <x>570</x>
@@ -176,21 +176,21 @@
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QPushButton" name="pushButton_4">
+      <widget class="QPushButton" name="anterior">
        <property name="text">
         <string>anterior</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="diretorio">
        <property name="text">
         <string>Escolher Diretorio</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_3">
+      <widget class="QPushButton" name="proximo">
        <property name="text">
         <string>proximo</string>
        </property>
@@ -198,12 +198,6 @@
      </item>
     </layout>
    </widget>
-   <zorder>graphicsView</zorder>
-   <zorder>pushButton_2</zorder>
-   <zorder>verticalLayoutWidget</zorder>
-   <zorder>gridLayoutWidget</zorder>
-   <zorder>horizontalLayoutWidget</zorder>
-   <zorder>label_7</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
