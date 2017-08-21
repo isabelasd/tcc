@@ -9,6 +9,7 @@
 #include <QSpinBox>
 #include <QDir>
 #include <QGraphicsPixmapItem>
+#include <QImage>
 
 #define SCALE_INTERVAL 2
 #define SCALE_PREC 10 // Decimal com 1 casa
@@ -85,6 +86,8 @@ private slots:
     void on_diretorio_clicked();
 
     void on_temperature_clicked();
+
+    void on_save_clicked();
 
 private:
     Ui::MainWindow *ui;

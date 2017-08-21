@@ -283,6 +283,7 @@ void MainWindow::on_diretorio_clicked()
 
     // scene begin
     // add image
+
     scene->addPixmap(first_image);
 
     // add markers
@@ -674,3 +675,64 @@ void MainWindow::on_anterior_clicked()
 
 }
 
+
+void MainWindow::on_save_clicked()
+{
+    QDir dirSave(dir + "/editadas");
+    if (!dirSave.exists()) {
+        dirSave.mkpath(".");
+    }
+
+    QString file_name_saved ;
+    QString file_name_oiginal = "edited" ;
+
+    QStringList image_list_save;
+
+
+    for (int i = 0 ; i < image_list.size() ; i++)
+    {
+        qDebug() << "\nLista(" << i << "):" << image_list.at(i) ;
+
+        // updates path
+        path_att = dir + "/" + image_list.at(i);
+        path_att_cv  = path_att.toUtf8().constData() ;
+
+        // recreate pixmap
+        scene -> addPixmap( path_att );
+
+        QPen blackpen(Qt::black);
+        blackpen.setWidth(0);
+        // central marker
+        mark1 = scene ->addRect(x_markers[i*6],y_markers[i*6],wc,hc,blackpen);
+        // fingers markers
+        // dedao
+        mark2 = scene ->addRect(x_markers[i*6+1],y_markers[i*6+1],wf,hf,blackpen);
+        // indicador
+        mark3 = scene ->addRect(x_markers[i*6+2],y_markers[i*6+2],wf,hf,blackpen);
+        // medio
+        mark4 = scene ->addRect(x_markers[i*6+3],y_markers[i*6+3],wf,hf,blackpen);
+        // anelar
+        mark5 = scene ->addRect(x_markers[i*6+4],y_markers[i*6+4],wf,hf,blackpen);
+        // minimo
+        mark6 = scene ->addRect(x_markers[i*6+5],y_markers[i*6+5],wf,hf,blackpen);
+
+        QPixmap pixMap = this->ui->graphicsView->grab();
+
+        file_name_saved = file_name_oiginal + QString::number(i);
+
+
+        pixMap.save(dir + "/editadas/"  + file_name_saved + ".png");
+       // qDebug() << "\nLista editada 1 (" << i << "):" << image_list_save.at(i) ;
+
+
+    }
+
+    dirSave.setNameFilters( QStringList() << "*.png" ) ;
+    image_list_save = dirSave.entryList() ;
+    for (int i = 0 ; i < image_list_save.size() ; i++)
+    {
+        qDebug() << "\nLista editada 2 (" << i << "):" << image_list_save.at(i) ;
+    }
+
+
+}
