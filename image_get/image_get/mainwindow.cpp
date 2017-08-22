@@ -173,26 +173,6 @@ int find_closest_match( int BGR[], double R_interp[], double G_interp[], double 
 }
 
 
-void MainWindow::set_mark_values(int index_image, int x_values [], int y_values [] )
-{
-   x_values[index_image*6]   = mark1 -> sceneBoundingRect().topLeft().x();
-   x_values[index_image*6+1] = mark2 -> sceneBoundingRect().topLeft().x();
-   x_values[index_image*6+2] = mark3 -> sceneBoundingRect().topLeft().x();
-   x_values[index_image*6+3] = mark4 -> sceneBoundingRect().topLeft().x();
-   x_values[index_image*6+4] = mark5 -> sceneBoundingRect().topLeft().x();
-   x_values[index_image*6+5] = mark6 -> sceneBoundingRect().topLeft().x();
-
-   y_values[index_image*6]   = mark1 -> sceneBoundingRect().topLeft().y();
-   y_values[index_image*6+1] = mark2 -> sceneBoundingRect().topLeft().y();
-   y_values[index_image*6+2] = mark3 -> sceneBoundingRect().topLeft().y();
-   y_values[index_image*6+3] = mark4 -> sceneBoundingRect().topLeft().y();
-   y_values[index_image*6+4] = mark5 -> sceneBoundingRect().topLeft().y();
-   y_values[index_image*6+5] = mark6 -> sceneBoundingRect().topLeft().y();
-
-}
-
-
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -372,6 +352,33 @@ void MainWindow::on_temperature_clicked()
                          );
 
                          */
+    qDebug() << "X1 : "    << QString::number(coordinates[0]) <<
+            " Y1 : "   << QString::number(coordinates[1]) <<
+            "\n X2 : " << QString::number(coordinates[2]) <<
+            " Y2 : "   << QString::number(coordinates[3]) <<
+            "\n X3 : " << QString::number(coordinates[4]) <<
+            " Y3 : "   << QString::number(coordinates[5]) <<
+            "\n X4 : " << QString::number(coordinates[6]) <<
+            " Y4 : "   << QString::number(coordinates[7]) <<
+            "\n X5 : " << QString::number(coordinates[8]) <<
+            " Y5 : "   << QString::number(coordinates[9]) <<
+            "\n X6 : " << QString::number(coordinates[10]) <<
+            " Y6 : "   << QString::number(coordinates[11]) <<
+            "X7 : "    << QString::number(coordinates[12]) <<
+                        " Y7 : "   << QString::number(coordinates[13]) <<
+                        "\n X8 : " << QString::number(coordinates[14]) <<
+                        " Y8 : "   << QString::number(coordinates[15]) <<
+                        "\n X9 : " << QString::number(coordinates[16]) <<
+                        " Y9 : "   << QString::number(coordinates[17]) <<
+                        "\n X10 : " << QString::number(coordinates[18]) <<
+                        " Y10 : "   << QString::number(coordinates[19]) <<
+                        "\n X11 : " << QString::number(coordinates[20]) <<
+                        " Y11 : "   << QString::number(coordinates[21]) <<
+                        "\n X12 : " << QString::number(coordinates[22]) <<
+                        " Y12 : "   << QString::number(coordinates[23])
+            ;
+
+
 
     // read image (using the path)
     image = imread( path_att_cv );
@@ -519,35 +526,20 @@ void MainWindow::on_temperature_clicked()
     temp_values[image_number*6+4] = temperature_interp[index_min5];
     temp_values[image_number*6+5] = temperature_interp[index_min6];
 
-    // set mark x and y values
-    set_mark_values(image_number, x_markers, y_markers) ;
+    // set mark x and y values to get markers position
+    x_markers[image_number*6]   = mark1 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+1] = mark2 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+2] = mark3 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+3] = mark4 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+4] = mark5 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+5] = mark6 -> sceneBoundingRect().topLeft().x();
 
-    /*
-    qDebug() << "\nintensidade 1 :" << QString::number(temp_values[image_number*6]) <<
-                "\nintensidade 2 :" << QString::number(temp_values[image_number*6+1]) <<
-                "\nintensidade 3 :" << QString::number(temp_values[image_number*6+2]) <<
-                "\nintensidade 4 :" << QString::number(temp_values[image_number*6+3]) <<
-                "\nintensidade 5 :" << QString::number(temp_values[image_number*6+4]) <<
-                "\nintensidade 6 :" << QString::number(temp_values[image_number*6+5])
-                ;
-    qDebug() << "\nx 1 :" << QString::number(x_markers[image_number*6]) <<
-                "\nx 2 :" << QString::number(x_markers[image_number*6+1]) <<
-                "\nx 3 :" << QString::number(x_markers[image_number*6+2]) <<
-                "\nx 4 :" << QString::number(x_markers[image_number*6+3]) <<
-                "\nx 5 :" << QString::number(x_markers[image_number*6+4]) <<
-                "\nx 6 :" << QString::number(x_markers[image_number*6+5])
-                ;
-
-    qDebug() << "\ny 1 :" << QString::number(y_markers[image_number*6]) <<
-                "\ny 2 :" << QString::number(y_markers[image_number*6+1]) <<
-                "\ny 3 :" << QString::number(y_markers[image_number*6+2]) <<
-                "\ny 4 :" << QString::number(y_markers[image_number*6+3]) <<
-                "\ny 5 :" << QString::number(y_markers[image_number*6+4]) <<
-                "\ny 6 :" << QString::number(y_markers[image_number*6+5])
-                ;
-
-
-    */
+    y_markers[image_number*6]   = mark1 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+1] = mark2 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+2] = mark3 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+3] = mark4 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+4] = mark5 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+5] = mark6 -> sceneBoundingRect().topLeft().y();
 
 
    //-----------------------------------------------------
@@ -557,22 +549,68 @@ void MainWindow::on_temperature_clicked()
 //spinbox used for bigger marker. updates its size
 void MainWindow::on_spinBox_valueChanged(int arg1)
 {
+
+    x_markers[image_number*6]   = mark1 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+1] = mark2 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+2] = mark3 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+3] = mark4 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+4] = mark5 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+5] = mark6 -> sceneBoundingRect().topLeft().x();
+
+    y_markers[image_number*6]   = mark1 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+1] = mark2 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+2] = mark3 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+3] = mark4 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+4] = mark5 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+5] = mark6 -> sceneBoundingRect().topLeft().y();
+
     wc = arg1 ;
     hc = arg1 ;
-    mark1 -> setRect(x_markers[image_number*6],y_markers[image_number*6] , wc, hc) ;
+
+    qreal x_temp = x_markers[image_number*6] ;
+    qreal y_temp = y_markers[image_number*6] ;
+
+    // redraw marker and set reference to 0, 0 (scene reference). this is important, otherwise doesnt work.
+    mark1 -> setRect(QRectF(x_markers[image_number*6],y_markers[image_number*6] , wc, hc)) ;
+    mark1 -> setPos(0,0);
+
+
+
 }
 
 
 //spinbox used for smaller markers. updates the size of the markers
 void MainWindow::on_spinBox_2_valueChanged(int arg1)
 {
+    x_markers[image_number*6]   = mark1 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+1] = mark2 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+2] = mark3 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+3] = mark4 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+4] = mark5 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+5] = mark6 -> sceneBoundingRect().topLeft().x();
+
+    y_markers[image_number*6]   = mark1 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+1] = mark2 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+2] = mark3 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+3] = mark4 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+4] = mark5 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+5] = mark6 -> sceneBoundingRect().topLeft().y();
+
     wf = arg1 ;
     hf = arg1 ;
-    mark2 -> setRect(x_markers[image_number*6+1],y_markers[image_number*6+1] , wf, hf) ;
-    mark3 -> setRect(x_markers[image_number*6+2],y_markers[image_number*6+2] , wf, hf) ;
-    mark4 -> setRect(x_markers[image_number*6+3],y_markers[image_number*6+3] , wf, hf) ;
-    mark5 -> setRect(x_markers[image_number*6+4],y_markers[image_number*6+4] , wf, hf) ;
-    mark6 -> setRect(x_markers[image_number*6+5],y_markers[image_number*6+5] , wf, hf) ;
+
+
+    // redraw marker and set reference to 0, 0 (scene reference). this is important, otherwise doesnt work.
+    mark2 -> setRect(QRectF(x_markers[image_number*6+1],y_markers[image_number*6+1] , wf, hf)) ;
+    mark2 -> setPos(0,0);
+    mark3 -> setRect(QRectF(x_markers[image_number*6+2],y_markers[image_number*6+2] , wf, hf)) ;
+    mark3 -> setPos(0,0);
+    mark4 -> setRect(QRectF(x_markers[image_number*6+3],y_markers[image_number*6+3] , wf, hf)) ;
+    mark4 -> setPos(0,0);
+    mark5 -> setRect(QRectF(x_markers[image_number*6+4],y_markers[image_number*6+4] , wf, hf)) ;
+    mark5 -> setPos(0,0);
+    mark6 -> setRect(QRectF(x_markers[image_number*6+5],y_markers[image_number*6+5] , wf, hf)) ;
+    mark6 -> setPos(0,0);
 }
 
 void MainWindow::on_proximo_clicked()

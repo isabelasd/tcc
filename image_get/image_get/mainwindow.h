@@ -62,8 +62,6 @@ public:
     double get_y_interp_increment( int x0, int x1, int y0, int y1, double temperature_precision ) ;
     void fill_vec( int v1, double v[], int initial_pos, double increment ) ;
     void fill_Color_Channel( int temperature_vec[], int colorVec[], double channel_dest[] ) ;
-    void set_mark_values(int index_image, int x_values [], int y_values [] ) ;
-
 
      qreal xc, yc, wc, hc ;
 
