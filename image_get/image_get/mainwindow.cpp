@@ -172,6 +172,75 @@ int find_closest_match( int BGR[], double R_interp[], double G_interp[], double 
     return index ;
 }
 
+bool fileExists(QString path) {
+    QFileInfo check_file(path);
+    // check if file exists and if yes: Is it really a file and no directory?
+    return check_file.exists() && check_file.isFile();
+}
+
+void MainWindow::CreateXML()
+{
+    // xml saving
+    QDomDocument document;
+    QDomElement root = document.createElement("Fotos");
+    document.appendChild(root);
+
+    for (int i =0 ; i < PICTURE_NUMBER ; i++)
+    {
+        QDomElement photos = document.createElement("Foto");
+        photos.setAttribute("Name", "Foto " + QString::number(i) );
+        photos.setAttribute("ID", QString::number(i) );
+        root.appendChild(photos);
+
+        for (int j = 0; j < MARKERS_NUMBER ; j++)
+        {
+            QDomElement markers = document.createElement("Marcadores");
+            markers.setAttribute("Name", "Marcador " + QString::number(j+1) );
+            markers.setAttribute("Temperatura", QString::number(j+1) );
+            photos.appendChild(markers);
+        }
+    }
+
+
+    // write to file
+    QFile file(dir + "/temperatura.xml");
+
+    if (!file.open(QIODevice::WriteOnly))
+        {
+            qDebug() << "Failed to open file for writing";
+            //return -1;
+        }
+        else
+        {
+            qDebug() << "Writing..";
+            QTextStream stream(&file);
+            stream << document.toString();
+            file.close();
+            qDebug() << "Finished";
+
+        }
+
+}
+
+ void ListElement(QDomElement root, QString tagname, QString attribute)
+ {
+     QDomNodeList items = root.elementsByTagName(tagname);
+     qDebug() << "Total items = " << items.count();
+
+     for (int i = 0 ; i < items.count(); i++)
+     {
+         QDomNode itemnode = items.at(i) ;
+
+         //convert to element
+         if(itemnode.isElement())
+         {
+             QDomElement itemele = itemnode.toElement();
+             qDebug() << itemele.attribute(attribute);
+         }
+     }
+ }
+
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -253,7 +322,14 @@ void MainWindow::on_diretorio_clicked()
     qDebug() << "\nprimeiro path:" << first_image ;
 
     //----------
+    // checking if xml file exists
+    // xml initialization
+    if (!fileExists(dir+"/temperatura.xml"))
+    {
+        CreateXML();
+    }
 
+    ReadXML();
 
     // open image to label  - not used anymore //
     /* QPixmap pix1(file_name) ;
@@ -299,6 +375,7 @@ void MainWindow::on_diretorio_clicked()
 
     path_att = dir + "/" + image_list.at(image_number);
     path_att_cv  = path_att.toUtf8().constData() ;
+
 }
 
 
@@ -774,3 +851,58 @@ void MainWindow::on_save_clicked()
 
 
 }
+
+void MainWindow::ReadXML()
+{
+    // xml saving
+    QDomDocument document;
+
+    // Load to file
+    QFile file(dir + "/temperatura.xml");
+
+    if (!file.open(QIODevice::ReadWrite))
+        {
+            qDebug() << "Failed to open file for writing";
+            //return -1;
+        }
+        else
+        {
+            if(!document.setContent((&file)))
+            {
+                 qDebug() << "Failed to load document";
+                    //return -1;
+            }
+            file.close();
+         }
+
+    // get the root element
+    QDomElement root = document.firstChildElement();
+
+    // List the photos
+    ListElement(root,"Foto", "Name");
+
+    qDebug() << "\nFinished reading xml" ;
+
+    //get Markers and temperature
+    QDomNodeList photos = root.elementsByTagName("Fotos");
+    for(int i = 0 ; i < photos.count() ; i++)
+    {
+        QDomNode photonode = photos.at(i);
+        // convert to an element
+        if(photonode.isElement())
+        {
+            QDomElement photo = photonode.toElement();
+            ListElement(photo,"Marcadores", "Temperatura");
+        }
+    }
+
+
+}
+
+
+void MainWindow::WriteXML()
+{
+
+}
+
+

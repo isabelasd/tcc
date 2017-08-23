@@ -10,6 +10,10 @@
 #include <QDir>
 #include <QGraphicsPixmapItem>
 #include <QImage>
+#include <QtXml>
+#include <QDebug>
+#include <QFileInfo>
+
 
 #define SCALE_INTERVAL 2
 #define SCALE_PREC 10 // Decimal com 1 casa
@@ -90,6 +94,12 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
+    QStandardItemModel *model ;
+    QString Filename ;
+
+    void ReadXML();
+    void WriteXML();
+    void CreateXML();
 
     // markers
     // mark 1 = central
