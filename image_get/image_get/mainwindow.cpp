@@ -187,7 +187,7 @@ void MainWindow::CreateXML()
 
     for (int i =0 ; i < PICTURE_NUMBER ; i++)
     {
-        QDomElement photos = document.createElement("Foto");
+        QDomElement photos = document.createElement("Fotos");
         photos.setAttribute("Name", "Foto " + QString::number(i) );
         photos.setAttribute("ID", QString::number(i) );
         root.appendChild(photos);
@@ -879,7 +879,7 @@ void MainWindow::ReadXML()
     QDomElement root = document.firstChildElement();
 
     // List the photos
-    ListElement(root,"Foto", "Name");
+    ListElement(root,"Fotos", "Name");
 
     qDebug() << "\nFinished reading xml" ;
 
