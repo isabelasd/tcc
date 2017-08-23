@@ -187,17 +187,17 @@ void MainWindow::CreateXML()
 
     for (int i =0 ; i < PICTURE_NUMBER ; i++)
     {
-        QDomElement photos = document.createElement("Fotos");
-        photos.setAttribute("Name", "Foto " + QString::number(i) );
-        photos.setAttribute("ID", QString::number(i) );
-        root.appendChild(photos);
+        QDomElement photo = document.createElement("Foto");
+        photo.setAttribute("Name", "Foto " + QString::number(i) );
+        photo.setAttribute("ID", QString::number(i) );
+        root.appendChild(photo);
 
         for (int j = 0; j < MARKERS_NUMBER ; j++)
         {
-            QDomElement markers = document.createElement("Marcadores");
-            markers.setAttribute("Name", "Marcador " + QString::number(j+1) );
-            markers.setAttribute("Temperatura", QString::number(j+1) );
-            photos.appendChild(markers);
+            QDomElement marker = document.createElement("Marcador");
+            marker.setAttribute("Name", "Marcador " + QString::number(j+1) );
+            marker.setAttribute("Temperatura", QString::number(j+1) );
+            photo.appendChild(marker);
         }
     }
 
@@ -879,12 +879,12 @@ void MainWindow::ReadXML()
     QDomElement root = document.firstChildElement();
 
     // List the photos
-    ListElement(root,"Fotos", "Name");
+    ListElement(root,"Foto", "Name");
 
     qDebug() << "\nFinished reading xml" ;
 
     //get Markers and temperature
-    QDomNodeList photos = root.elementsByTagName("Fotos");
+    QDomNodeList photos = root.elementsByTagName("Foto");
     for(int i = 0 ; i < photos.count() ; i++)
     {
         QDomNode photonode = photos.at(i);
@@ -892,7 +892,7 @@ void MainWindow::ReadXML()
         if(photonode.isElement())
         {
             QDomElement photo = photonode.toElement();
-            ListElement(photo,"Marcadores", "Temperatura");
+            ListElement(photo,"Marcador", "Temperatura");
         }
     }
 
