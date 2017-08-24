@@ -216,6 +216,8 @@ bool fileExists(QString path) {
              QDomElement marker = document.createElement("Marcador");
              marker.setAttribute("Name", "Marcador " + QString::number(j+1) );
              marker.setAttribute("Temperatura", QString::number(temp_values[i * 6 + j]) );
+             marker.setAttribute("x", QString::number(x_markers[i * 6 + j]) );
+             marker.setAttribute("y", QString::number(y_markers[i * 6 + j]) );
              photo.appendChild(marker);
          }
      }
@@ -240,6 +242,57 @@ bool fileExists(QString path) {
          }
 
  }
+
+ void MainWindow::ReadXML()
+ {
+     // xml saving
+     QDomDocument document;
+
+     // Load to file
+     QFile file(dir + "/temperatura.xml");
+
+     if (!file.open(QIODevice::ReadWrite))
+         {
+             qDebug() << "Failed to open file for writing";
+             //return -1;
+         }
+         else
+         {
+             if(!document.setContent((&file)))
+             {
+                  qDebug() << "Failed to load document";
+                     //return -1;
+             }
+             file.close();
+          }
+
+     // get the root element
+     QDomElement root = document.firstChildElement();
+
+     // List the photos
+     ListElement(root,"Foto", "Name");
+
+     qDebug() << "\nFinished reading xml" ;
+
+     //get Markers and temperature
+     QDomNodeList photos = root.elementsByTagName("Foto");
+     for(int i = 0 ; i < photos.count() ; i++)
+     {
+         QDomNode photonode = photos.at(i);
+         // convert to an element
+         if(photonode.isElement())
+         {
+             QDomElement photo = photonode.toElement();
+             ListElement(photo,"Marcador", "Temperatura");
+             ListElement(photo,"Marcador", "x");
+             ListElement(photo,"Marcador", "y");
+         }
+     }
+
+
+ }
+
+
 
 
 
@@ -876,52 +929,3 @@ void MainWindow::on_save_clicked()
 
 
 }
-
-void MainWindow::ReadXML()
-{
-    // xml saving
-    QDomDocument document;
-
-    // Load to file
-    QFile file(dir + "/temperatura.xml");
-
-    if (!file.open(QIODevice::ReadWrite))
-        {
-            qDebug() << "Failed to open file for writing";
-            //return -1;
-        }
-        else
-        {
-            if(!document.setContent((&file)))
-            {
-                 qDebug() << "Failed to load document";
-                    //return -1;
-            }
-            file.close();
-         }
-
-    // get the root element
-    QDomElement root = document.firstChildElement();
-
-    // List the photos
-    ListElement(root,"Foto", "Name");
-
-    qDebug() << "\nFinished reading xml" ;
-
-    //get Markers and temperature
-    QDomNodeList photos = root.elementsByTagName("Foto");
-    for(int i = 0 ; i < photos.count() ; i++)
-    {
-        QDomNode photonode = photos.at(i);
-        // convert to an element
-        if(photonode.isElement())
-        {
-            QDomElement photo = photonode.toElement();
-            ListElement(photo,"Marcador", "Temperatura");
-        }
-    }
-
-
-}
-
-
