@@ -3,6 +3,7 @@
 #include <QPixmap>
 #include <QFileDialog>
 #include <QMessageBox>
+#include "patientfile.h"
 
 
 // FIND NICE WAY TO DECLARE LOOKUP TABLE !!! PLEZ :)
@@ -172,14 +173,14 @@ int find_closest_match( int BGR[], double R_interp[], double G_interp[], double 
     return index ;
 }
 
-bool fileExists(QString path) {
+bool MainWindow::fileExists(QString path) {
     QFileInfo check_file(path);
     // check if file exists and if yes: Is it really a file and no directory?
     return check_file.exists() && check_file.isFile();
 }
 
 
- void ListElement(QDomElement root, QString tagname, QString attribute)
+ void MainWindow::ListElement(QDomElement root, QString tagname, QString attribute)
  {
      QDomNodeList items = root.elementsByTagName(tagname);
      qDebug() << "Total items = " << items.count();
@@ -197,7 +198,7 @@ bool fileExists(QString path) {
      }
  }
 
- void MainWindow::UpdateXML()
+ void MainWindow::UpdateXML_temperature()
  {
      // xml saving
      QDomDocument document;
@@ -243,7 +244,7 @@ bool fileExists(QString path) {
 
  }
 
- void MainWindow::ReadXML()
+ void MainWindow::ReadXML_temperature()
  {
      // xml saving
      QDomDocument document;
@@ -296,7 +297,6 @@ bool fileExists(QString path) {
 
 
 
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -305,6 +305,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
+    scene->setSceneRect( 0, 0, 320, 240 );
 
     // initialize variables
     xc = 10;
@@ -352,6 +353,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui -> proximo -> setEnabled(false);
     ui -> save -> setEnabled(false);
     ui -> temperature -> setEnabled(false);
+    ui->editarFicha->setEnabled(false);
 
     ui ->spinBox->setEnabled(false);
     ui -> spinBox_2 ->setEnabled(false);
@@ -391,10 +393,10 @@ void MainWindow::on_diretorio_clicked()
     // xml initialization
     if (!fileExists(dir+"/temperatura.xml"))
     {
-        UpdateXML();
+        UpdateXML_temperature();
     }
 
-    ReadXML();
+    ReadXML_temperature();
 
     // open image to label  - not used anymore //
     /* QPixmap pix1(file_name) ;
@@ -445,9 +447,11 @@ void MainWindow::on_diretorio_clicked()
     ui -> proximo -> setEnabled(true);
     ui -> save -> setEnabled(true);
     ui -> temperature -> setEnabled(true);
+    ui -> editarFicha -> setEnabled(true);
 
     ui ->spinBox->setEnabled(true);
     ui -> spinBox_2 ->setEnabled(true);
+
 
 }
 
@@ -692,11 +696,11 @@ void MainWindow::on_temperature_clicked()
     y_markers[image_number*6+5] = mark6 -> sceneBoundingRect().topLeft().y();
 
 
-    UpdateXML();
+    UpdateXML_temperature();
 
     qDebug() << "\n\n\n leitura : " ;
 
-    ReadXML();
+    ReadXML_temperature();
    //-----------------------------------------------------
 
 }
@@ -928,4 +932,15 @@ void MainWindow::on_save_clicked()
     }
 
 
+}
+
+void MainWindow::on_editarFicha_clicked()
+{
+    // create new Window
+    patientFile myPatient;
+    myPatient.set_dir_patient(dir);
+
+    qDebug() << myPatient.get_dir_patient() << "\n";
+    myPatient.setModal(true);
+    myPatient.exec();
 }

@@ -68,11 +68,15 @@ public:
     void fill_vec( int v1, double v[], int initial_pos, double increment ) ;
     void fill_Color_Channel( int temperature_vec[], int colorVec[], double channel_dest[] ) ;
 
+    bool fileExists(QString path);
+    void ListElement(QDomElement root, QString tagname, QString attribute);
+
+    void ReadXML_temperature();
+    void UpdateXML_temperature();
+
      qreal xc, yc, wc, hc ;
 
      qreal xf, yf, wf, hf ;
-
-
 
     ~MainWindow();
 
@@ -93,14 +97,13 @@ private slots:
     void on_save_clicked();
 
 
+    void on_editarFicha_clicked();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
-    QStandardItemModel *model ;
     QString Filename ;
 
-    void ReadXML();
-    void UpdateXML();
 
     // markers
     // mark 1 = central

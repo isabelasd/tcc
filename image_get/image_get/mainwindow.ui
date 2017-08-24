@@ -198,18 +198,31 @@
      </item>
     </layout>
    </widget>
-   <widget class="QPushButton" name="save">
+   <widget class="QWidget" name="horizontalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>350</y>
-      <width>111</width>
-      <height>31</height>
+      <x>460</x>
+      <y>320</y>
+      <width>281</width>
+      <height>81</height>
      </rect>
     </property>
-    <property name="text">
-     <string>salvar alteracoes</string>
-    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="save">
+       <property name="text">
+        <string>salvar alteracoes</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="editarFicha">
+       <property name="text">
+        <string>editar ficha</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">

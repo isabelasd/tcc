@@ -26,13 +26,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    patientfile.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    patientfile.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    patientfile.ui
 
 
 
