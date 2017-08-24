@@ -34,6 +34,7 @@ namespace Ui {
 class MainWindow;
 }
 
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -91,6 +92,7 @@ private slots:
 
     void on_save_clicked();
 
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
@@ -98,8 +100,7 @@ private:
     QString Filename ;
 
     void ReadXML();
-    void WriteXML();
-    void CreateXML();
+    void UpdateXML();
 
     // markers
     // mark 1 = central

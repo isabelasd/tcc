@@ -178,49 +178,6 @@ bool fileExists(QString path) {
     return check_file.exists() && check_file.isFile();
 }
 
-void MainWindow::CreateXML()
-{
-    // xml saving
-    QDomDocument document;
-    QDomElement root = document.createElement("Fotos");
-    document.appendChild(root);
-
-    for (int i =0 ; i < PICTURE_NUMBER ; i++)
-    {
-        QDomElement photo = document.createElement("Foto");
-        photo.setAttribute("Name", "Foto " + QString::number(i) );
-        photo.setAttribute("ID", QString::number(i) );
-        root.appendChild(photo);
-
-        for (int j = 0; j < MARKERS_NUMBER ; j++)
-        {
-            QDomElement marker = document.createElement("Marcador");
-            marker.setAttribute("Name", "Marcador " + QString::number(j+1) );
-            marker.setAttribute("Temperatura", QString::number(j+1) );
-            photo.appendChild(marker);
-        }
-    }
-
-
-    // write to file
-    QFile file(dir + "/temperatura.xml");
-
-    if (!file.open(QIODevice::WriteOnly))
-        {
-            qDebug() << "Failed to open file for writing";
-            //return -1;
-        }
-        else
-        {
-            qDebug() << "Writing..";
-            QTextStream stream(&file);
-            stream << document.toString();
-            file.close();
-            qDebug() << "Finished";
-
-        }
-
-}
 
  void ListElement(QDomElement root, QString tagname, QString attribute)
  {
@@ -239,6 +196,51 @@ void MainWindow::CreateXML()
          }
      }
  }
+
+ void MainWindow::UpdateXML()
+ {
+     // xml saving
+     QDomDocument document;
+     QDomElement root = document.createElement("Fotos");
+     document.appendChild(root);
+
+     for (int i =0 ; i < PICTURE_NUMBER ; i++)
+     {
+         QDomElement photo = document.createElement("Foto");
+         photo.setAttribute("Name", "Foto " + QString::number(i) );
+         photo.setAttribute("ID", QString::number(i) );
+         root.appendChild(photo);
+
+         for (int j = 0; j < MARKERS_NUMBER ; j++)
+         {
+             QDomElement marker = document.createElement("Marcador");
+             marker.setAttribute("Name", "Marcador " + QString::number(j+1) );
+             marker.setAttribute("Temperatura", QString::number(temp_values[i * 6 + j]) );
+             photo.appendChild(marker);
+         }
+     }
+
+
+     // write to file
+     QFile file(dir + "/temperatura.xml");
+
+     if (!file.open(QIODevice::WriteOnly))
+         {
+             qDebug() << "Failed to open file for writing";
+             //return -1;
+         }
+         else
+         {
+             qDebug() << "Writing..";
+             QTextStream stream(&file);
+             stream << document.toString();
+             file.close();
+             qDebug() << "Finished";
+
+         }
+
+ }
+
 
 
 
@@ -292,6 +294,16 @@ MainWindow::MainWindow(QWidget *parent) :
         temp_values[i] = 0 ;
     }
 
+    // these buttons do not work unless user already chose a valid directory
+    ui -> anterior -> setEnabled(false);
+    ui -> proximo -> setEnabled(false);
+    ui -> save -> setEnabled(false);
+    ui -> temperature -> setEnabled(false);
+
+    ui ->spinBox->setEnabled(false);
+    ui -> spinBox_2 ->setEnabled(false);
+
+
 }
 
 MainWindow::~MainWindow()
@@ -326,7 +338,7 @@ void MainWindow::on_diretorio_clicked()
     // xml initialization
     if (!fileExists(dir+"/temperatura.xml"))
     {
-        CreateXML();
+        UpdateXML();
     }
 
     ReadXML();
@@ -375,6 +387,14 @@ void MainWindow::on_diretorio_clicked()
 
     path_att = dir + "/" + image_list.at(image_number);
     path_att_cv  = path_att.toUtf8().constData() ;
+
+    ui -> anterior -> setEnabled(true);
+    ui -> proximo -> setEnabled(true);
+    ui -> save -> setEnabled(true);
+    ui -> temperature -> setEnabled(true);
+
+    ui ->spinBox->setEnabled(true);
+    ui -> spinBox_2 ->setEnabled(true);
 
 }
 
@@ -619,6 +639,11 @@ void MainWindow::on_temperature_clicked()
     y_markers[image_number*6+5] = mark6 -> sceneBoundingRect().topLeft().y();
 
 
+    UpdateXML();
+
+    qDebug() << "\n\n\n leitura : " ;
+
+    ReadXML();
    //-----------------------------------------------------
 
 }
@@ -896,12 +921,6 @@ void MainWindow::ReadXML()
         }
     }
 
-
-}
-
-
-void MainWindow::WriteXML()
-{
 
 }
 
