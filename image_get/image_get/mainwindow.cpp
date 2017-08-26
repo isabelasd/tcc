@@ -219,6 +219,8 @@ bool MainWindow::fileExists(QString path) {
              marker.setAttribute("Temperatura", QString::number(temp_values[i * 6 + j]) );
              marker.setAttribute("x", QString::number(x_markers[i * 6 + j]) );
              marker.setAttribute("y", QString::number(y_markers[i * 6 + j]) );
+             marker.setAttribute("central_marker_size", QString::number(wc));
+             marker.setAttribute("fingers_marker_size",QString::number(wf));
              photo.appendChild(marker);
          }
      }
@@ -284,9 +286,13 @@ bool MainWindow::fileExists(QString path) {
          if(photonode.isElement())
          {
              QDomElement photo = photonode.toElement();
-             ListElement(photo,"Marcador", "Temperatura");
-             ListElement(photo,"Marcador", "x");
-             ListElement(photo,"Marcador", "y");
+             // this is for debug or for reading some value out of a xml file.
+             // make sure that if there is a file with the temperature info, put that on the interface and in the variables
+            // ListElement(photo,"Marcador", "Temperatura");
+            // ListElement(photo,"Marcador", "x");
+            // ListElement(photo,"Marcador", "y");
+            // ListElement(photo,"Marcador", "central_marker_size");
+            //  ListElement(photo,"Marcador", "fingers_marker_size");
          }
      }
 
