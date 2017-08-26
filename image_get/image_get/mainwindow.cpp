@@ -3,7 +3,7 @@
 #include <QPixmap>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "patientfile.h"
+
 
 
 // FIND NICE WAY TO DECLARE LOOKUP TABLE !!! PLEZ :)
@@ -358,6 +358,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui ->spinBox->setEnabled(false);
     ui -> spinBox_2 ->setEnabled(false);
 
+    ui->photo_index->setText("Nenhuma foto valida selecionada");
+
 
 }
 
@@ -409,6 +411,8 @@ void MainWindow::on_diretorio_clicked()
 
     scene->addPixmap(first_image);
 
+    ui->photo_index->setText("Foto " + QString::number(image_number));
+
     // add markers
     // markers are displayed in increasing number sequence, from left to right
 
@@ -417,8 +421,51 @@ void MainWindow::on_diretorio_clicked()
     QPen blackpen(Qt::black);
     blackpen.setWidth(0);
 
+    mark1 = new squaremarker();
+    mark1->setX(xc) ;
+    mark1->setY(yc) ;
+    mark1->w_m = wc ;
+    mark1->h_m = hc ;
+    scene->addItem(mark1);
+
+    mark2 = new squaremarker();
+    mark2->setX(xf) ;
+    mark2->setY(yf) ;
+    mark2->w_m = wf ;
+    mark2->h_m = hf ;
+    scene->addItem(mark2);
+
+    mark3 = new squaremarker();
+    mark3->setX(xf+20) ;
+    mark3->setY(yf) ;
+    mark3->w_m = wf ;
+    mark3->h_m = hf ;
+    scene->addItem(mark3);
+
+    mark4 = new squaremarker();
+    mark4->setX(xf+40) ;
+    mark4->setY(yf) ;
+    mark4->w_m = wf ;
+    mark4->h_m = hf ;
+    scene->addItem(mark4);
+
+    mark5 = new squaremarker();
+    mark5->setX(xf+60) ;
+    mark5->setY(yf) ;
+    mark5->w_m = wf ;
+    mark5->h_m = hf ;
+    scene->addItem(mark5);
+
+    mark6 = new squaremarker();
+    mark6->setX(xf+80) ;
+    mark6->setY(yf) ;
+    mark6->w_m = wf ;
+    mark6->h_m = hf ;
+    scene->addItem(mark6);
+/*
     mark1 = scene ->addRect(xc,yc,wc,hc,blackpen);
     mark1->setFlag( QGraphicsItem::ItemIsMovable );
+
 
 
     // fingers markers
@@ -440,6 +487,7 @@ void MainWindow::on_diretorio_clicked()
     mark6 = scene ->addRect(xf+80,yf,wf,hf,blackpen);
     mark6->setFlag( QGraphicsItem::ItemIsMovable );
 
+    */
     path_att = dir + "/" + image_list.at(image_number);
     path_att_cv  = path_att.toUtf8().constData() ;
 
@@ -726,14 +774,20 @@ void MainWindow::on_spinBox_valueChanged(int arg1)
     wc = arg1 ;
     hc = arg1 ;
 
-    qreal x_temp = x_markers[image_number*6] ;
-    qreal y_temp = y_markers[image_number*6] ;
-
     // redraw marker and set reference to 0, 0 (scene reference). this is important, otherwise doesnt work.
+    /*
+
     mark1 -> setRect(QRectF(x_markers[image_number*6],y_markers[image_number*6] , wc, hc)) ;
     mark1 -> setPos(0,0);
+*/
 
+    mark1->setX(x_markers[image_number*6]) ;
+    mark1->setY(y_markers[image_number*6]) ;
+    mark1->w_m = wc ;
+    mark1->h_m = hc ;
 
+   scene->removeItem(mark1);
+   scene->addItem(mark1);
 
 }
 
@@ -758,7 +812,42 @@ void MainWindow::on_spinBox_2_valueChanged(int arg1)
     wf = arg1 ;
     hf = arg1 ;
 
+    mark2->setX(x_markers[image_number*6+1]) ;
+    mark2->setY(y_markers[image_number*6+1]) ;
+    mark2->w_m = wf ;
+    mark2->h_m = hf ;
+    scene->removeItem(mark2);
+    scene->addItem(mark2);
 
+    mark3->setX(x_markers[image_number*6+2]) ;
+    mark3->setY(y_markers[image_number*6+2]) ;
+    mark3->w_m = wf ;
+    mark3->h_m = hf ;
+    scene->removeItem(mark3);
+    scene->addItem(mark3);
+
+    mark4->setX(x_markers[image_number*6+3]) ;
+    mark4->setY(y_markers[image_number*6+3]) ;
+    mark4->w_m = wf ;
+    mark4->h_m = hf ;
+    scene->removeItem(mark4);
+    scene->addItem(mark4);
+
+    mark5->setX(x_markers[image_number*6+4]) ;
+    mark5->setY(y_markers[image_number*6+4]) ;
+    mark5->w_m = wf ;
+    mark5->h_m = hf ;
+    scene->removeItem(mark5);
+    scene->addItem(mark5);
+
+    mark6->setX(x_markers[image_number*6+5]) ;
+    mark6->setY(y_markers[image_number*6+5]) ;
+    mark6->w_m = wf ;
+    mark6->h_m = hf ;
+    scene->removeItem(mark6);
+    scene->addItem(mark6);
+
+    /*
     // redraw marker and set reference to 0, 0 (scene reference). this is important, otherwise doesnt work.
     mark2 -> setRect(QRectF(x_markers[image_number*6+1],y_markers[image_number*6+1] , wf, hf)) ;
     mark2 -> setPos(0,0);
@@ -770,6 +859,8 @@ void MainWindow::on_spinBox_2_valueChanged(int arg1)
     mark5 -> setPos(0,0);
     mark6 -> setRect(QRectF(x_markers[image_number*6+5],y_markers[image_number*6+5] , wf, hf)) ;
     mark6 -> setPos(0,0);
+*/
+
 }
 
 void MainWindow::on_proximo_clicked()
@@ -792,9 +883,57 @@ void MainWindow::on_proximo_clicked()
     // recreate pixmap
     scene -> addPixmap( path_att );
 
+    ui->photo_index->setText("Foto " + QString::number(image_number));
+
     QPen blackpen(Qt::black);
     blackpen.setWidth(0);
     // central marker
+
+    mark1 = new squaremarker();
+    mark1->setX(x_markers[image_number*6]) ;
+    mark1->setY(y_markers[image_number*6]) ;
+    mark1->w_m = wc ;
+    mark1->h_m = hc ;
+    scene->addItem(mark1);
+
+    mark2 = new squaremarker();
+    mark2->setX(x_markers[image_number*6+1]) ;
+    mark2->setY(y_markers[image_number*6+1]) ;
+    mark2->w_m = wf ;
+    mark2->h_m = hf ;
+    scene->addItem(mark2);
+
+    mark3 = new squaremarker();
+    mark3->setX(x_markers[image_number*6+2]) ;
+    mark3->setY(y_markers[image_number*6+2]) ;
+    mark3->w_m = wf ;
+    mark3->h_m = hf ;
+    scene->addItem(mark3);
+
+    mark4 = new squaremarker();
+    mark4->setX(x_markers[image_number*6+3]) ;
+    mark4->setY(y_markers[image_number*6+3]) ;
+    mark4->w_m = wf ;
+    mark4->h_m = hf ;
+    scene->addItem(mark4);
+
+    mark5 = new squaremarker();
+    mark5->setX(x_markers[image_number*6+4]) ;
+    mark5->setY(y_markers[image_number*6+4]) ;
+    mark5->w_m = wf ;
+    mark5->h_m = hf ;
+    scene->addItem(mark5);
+
+    mark6 = new squaremarker();
+    mark6->setX(x_markers[image_number*6+5]) ;
+    mark6->setY(y_markers[image_number*6+5]) ;
+    mark6->w_m = wf ;
+    mark6->h_m = hf ;
+    scene->addItem(mark6);
+
+
+
+    /*
     mark1 = scene ->addRect(x_markers[image_number*6],y_markers[image_number*6],wc,hc,blackpen);
     mark1->setFlag( QGraphicsItem::ItemIsMovable );
     // fingers markers
@@ -813,6 +952,9 @@ void MainWindow::on_proximo_clicked()
     // minimo
     mark6 = scene ->addRect(x_markers[image_number*6+5],y_markers[image_number*6+5],wf,hf,blackpen);
     mark6->setFlag( QGraphicsItem::ItemIsMovable );
+
+
+    */
     /*
     for (int i = 0 ; i < image_list.size() ; i++)
     {
@@ -848,8 +990,56 @@ void MainWindow::on_anterior_clicked()
     // recreate pixmap
     scene -> addPixmap( path_att );
 
+    ui->photo_index->setText("Foto " + QString::number(image_number));
+
     QPen blackpen(Qt::black);
     blackpen.setWidth(0);
+
+    mark1 = new squaremarker();
+    mark1->setX(x_markers[image_number*6]) ;
+    mark1->setY(y_markers[image_number*6]) ;
+    mark1->w_m = wc ;
+    mark1->h_m = hc ;
+    scene->addItem(mark1);
+
+    mark2 = new squaremarker();
+    mark2->setX(x_markers[image_number*6+1]) ;
+    mark2->setY(y_markers[image_number*6+1]) ;
+    mark2->w_m = wf ;
+    mark2->h_m = hf ;
+    scene->addItem(mark2);
+
+    mark3 = new squaremarker();
+    mark3->setX(x_markers[image_number*6+2]) ;
+    mark3->setY(y_markers[image_number*6+2]) ;
+    mark3->w_m = wf ;
+    mark3->h_m = hf ;
+    scene->addItem(mark3);
+
+    mark4 = new squaremarker();
+    mark4->setX(x_markers[image_number*6+3]) ;
+    mark4->setY(y_markers[image_number*6+3]) ;
+    mark4->w_m = wf ;
+    mark4->h_m = hf ;
+    scene->addItem(mark4);
+
+    mark5 = new squaremarker();
+    mark5->setX(x_markers[image_number*6+4]) ;
+    mark5->setY(y_markers[image_number*6+4]) ;
+    mark5->w_m = wf ;
+    mark5->h_m = hf ;
+    scene->addItem(mark5);
+
+    mark6 = new squaremarker();
+    mark6->setX(x_markers[image_number*6+5]) ;
+    mark6->setY(y_markers[image_number*6+5]) ;
+    mark6->w_m = wf ;
+    mark6->h_m = hf ;
+    scene->addItem(mark6);
+
+
+    /*
+
     // central marker
     mark1 = scene ->addRect(x_markers[image_number*6],y_markers[image_number*6],wc,hc,blackpen);
     mark1->setFlag( QGraphicsItem::ItemIsMovable );
@@ -869,6 +1059,9 @@ void MainWindow::on_anterior_clicked()
     // minimo
     mark6 = scene ->addRect(x_markers[image_number*6+5],y_markers[image_number*6+5],wf,hf,blackpen);
     mark6->setFlag( QGraphicsItem::ItemIsMovable );
+
+
+    */
 
 }
 
@@ -900,6 +1093,55 @@ void MainWindow::on_save_clicked()
         QPen blackpen(Qt::black);
         blackpen.setWidth(0);
         // central marker
+
+        mark1 = new squaremarker();
+        mark1->setX(x_markers[i*6]) ;
+        mark1->setY(y_markers[i*6]) ;
+        mark1->w_m = wc ;
+        mark1->h_m = hc ;
+       // scene->removeItem(mark1);
+        scene->addItem(mark1);
+
+       // mark2 = new squaremarker();
+        mark2->setX(x_markers[i*6+1]) ;
+        mark2->setY(y_markers[i*6+1]) ;
+        mark2->w_m = wf ;
+        mark2->h_m = hf ;
+        scene->removeItem(mark2);
+        scene->addItem(mark2);
+
+       // mark3 = new squaremarker();
+        mark3->setX(x_markers[i*6+2]) ;
+        mark3->setY(y_markers[i*6+2]) ;
+        mark3->w_m = wf ;
+        mark3->h_m = hf ;
+        scene->removeItem(mark3);
+        scene->addItem(mark3);
+
+     //   mark4 = new squaremarker();
+        mark4->setX(x_markers[i*6+3]) ;
+        mark4->setY(y_markers[i*6+3]) ;
+        mark4->w_m = wf ;
+        mark4->h_m = hf ;
+        scene->removeItem(mark4);
+        scene->addItem(mark4);
+
+      //  mark5 = new squaremarker();
+        mark5->setX(x_markers[i*6+4]) ;
+        mark5->setY(y_markers[i*6+4]) ;
+        mark5->w_m = wf ;
+        mark5->h_m = hf ;
+        scene->removeItem(mark5);
+        scene->addItem(mark5);
+
+     //   mark6 = new squaremarker();
+        mark6->setX(x_markers[i*6+5]) ;
+        mark6->setY(y_markers[i*6+5]) ;
+        mark6->w_m = wf ;
+        mark6->h_m = hf ;
+        scene->removeItem(mark6);
+        scene->addItem(mark6);
+        /*
         mark1 = scene ->addRect(x_markers[i*6],y_markers[i*6],wc,hc,blackpen);
         // fingers markers
         // dedao
@@ -912,6 +1154,9 @@ void MainWindow::on_save_clicked()
         mark5 = scene ->addRect(x_markers[i*6+4],y_markers[i*6+4],wf,hf,blackpen);
         // minimo
         mark6 = scene ->addRect(x_markers[i*6+5],y_markers[i*6+5],wf,hf,blackpen);
+
+
+        */
 
         QPixmap pixMap = this->ui->graphicsView->grab();
 

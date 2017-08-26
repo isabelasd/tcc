@@ -27,11 +27,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    patientfile.cpp
+    patientfile.cpp \
+    squaremarker.cpp
 
 HEADERS += \
         mainwindow.h \
-    patientfile.h
+    patientfile.h \
+    squaremarker.h
 
 FORMS += \
         mainwindow.ui \

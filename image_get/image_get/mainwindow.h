@@ -14,6 +14,9 @@
 #include <QDebug>
 #include <QFileInfo>
 
+#include "squaremarker.h"
+#include "patientfile.h"
+
 
 #define SCALE_INTERVAL 2
 #define SCALE_PREC 10 // Decimal com 1 casa
@@ -107,13 +110,13 @@ private:
 
     // markers
     // mark 1 = central
-    QGraphicsRectItem *mark1;
+    squaremarker *mark1;
     // mark 2 = polegar , mark 3 = indicador... mark 6 = minimo
-    QGraphicsRectItem *mark2;
-    QGraphicsRectItem *mark3;
-    QGraphicsRectItem *mark4;
-    QGraphicsRectItem *mark5;
-    QGraphicsRectItem *mark6;
+    squaremarker *mark2;
+    squaremarker *mark3;
+    squaremarker *mark4;
+    squaremarker *mark5;
+    squaremarker *mark6;
 
 };
 
