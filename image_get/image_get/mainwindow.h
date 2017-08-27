@@ -63,6 +63,8 @@ public:
     int x_markers [ (MARKERS_NUMBER * PICTURE_NUMBER) ];
     int y_markers [ (MARKERS_NUMBER * PICTURE_NUMBER) ];
     double temp_values [ (MARKERS_NUMBER * PICTURE_NUMBER) ];
+    int size_bigger [ (MARKERS_NUMBER * PICTURE_NUMBER) ];
+    int size_smaller [ (MARKERS_NUMBER * PICTURE_NUMBER) ];
 
     // my functions
     int getIntensityGray (const Mat &image, int topLeftX, int topLeftY, int bottomRightX, int bottomRightY) ;
@@ -72,13 +74,12 @@ public:
     void fill_Color_Channel( int temperature_vec[], int colorVec[], double channel_dest[] ) ;
 
     bool fileExists(QString path);
-    void ListElement(QDomElement root, QString tagname, QString attribute);
+    QStringList ListElement(QDomElement root, QString tagname, QString attribute);
 
     void ReadXML_temperature();
     void UpdateXML_temperature();
 
      qreal xc, yc, wc, hc ;
-
      qreal xf, yf, wf, hf ;
 
     ~MainWindow();
@@ -86,20 +87,13 @@ public:
 private slots:
 
     void on_spinBox_valueChanged(int arg1);
-
     void on_spinBox_2_valueChanged(int arg1);
 
     void on_anterior_clicked();
-
     void on_proximo_clicked();
-
     void on_diretorio_clicked();
-
     void on_temperature_clicked();
-
     void on_save_clicked();
-
-
     void on_editarFicha_clicked();
 
 private:
@@ -117,7 +111,6 @@ private:
     squaremarker *mark4;
     squaremarker *mark5;
     squaremarker *mark6;
-
 };
 
 #endif // MAINWINDOW_H
