@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>30</y>
+      <y>40</y>
       <width>330</width>
       <height>250</height>
      </rect>
@@ -168,8 +168,8 @@
    <widget class="QWidget" name="horizontalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>320</y>
+      <x>450</x>
+      <y>350</y>
       <width>281</width>
       <height>81</height>
      </rect>
@@ -237,6 +237,44 @@
      <string>TextLabel</string>
     </property>
    </widget>
+   <widget class="QComboBox" name="processingMethod">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>10</y>
+      <width>331</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>manual</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>metodo1</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>metodo2</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>300</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Processa</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -247,6 +285,28 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuArquivo">
+    <property name="title">
+     <string>Arquivo</string>
+    </property>
+    <addaction name="actionEscolher_novo_diretorio"/>
+    <addaction name="actionSalvar"/>
+   </widget>
+   <widget class="QMenu" name="menuAjuda">
+    <property name="title">
+     <string>Ajuda</string>
+    </property>
+    <addaction name="actionComo_usar_o_programa"/>
+   </widget>
+   <widget class="QMenu" name="menuSobre">
+    <property name="title">
+     <string>Sobre</string>
+    </property>
+    <addaction name="actionSobre"/>
+   </widget>
+   <addaction name="menuArquivo"/>
+   <addaction name="menuAjuda"/>
+   <addaction name="menuSobre"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -255,10 +315,52 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionEscolher_novo_diretorio"/>
+   <addaction name="actionSalvar"/>
+   <addaction name="actionComo_usar_o_programa"/>
+   <addaction name="actionSobre"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionEscolher_novo_diretorio">
+   <property name="icon">
+    <iconset resource="myres.qrc">
+     <normaloff>:/iconimages/open-file-icon.png</normaloff>:/iconimages/open-file-icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Escolher novo diretorio</string>
+   </property>
+  </action>
+  <action name="actionSalvar">
+   <property name="icon">
+    <iconset resource="myres.qrc">
+     <normaloff>:/iconimages/saveicon.png</normaloff>:/iconimages/saveicon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Salvar</string>
+   </property>
+  </action>
+  <action name="actionComo_usar_o_programa">
+   <property name="icon">
+    <iconset resource="myres.qrc">
+     <normaloff>:/iconimages/helpicon.png</normaloff>:/iconimages/helpicon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Como usar o programa</string>
+   </property>
+  </action>
+  <action name="actionSobre">
+   <property name="icon">
+    <iconset resource="myres.qrc">
+     <normaloff>:/iconimages/abouticon.png</normaloff>:/iconimages/abouticon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Sobre</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="myres.qrc"/>
+ </resources>
  <connections/>
 </ui>

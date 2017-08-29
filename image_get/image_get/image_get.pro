@@ -51,3 +51,6 @@ LIBS += C:\opencv-build\bin\libopencv_imgproc320.dll
 LIBS += C:\opencv-build\bin\libopencv_features2d320.dll
 LIBS += C:\opencv-build\bin\libopencv_calib3d320.dll
 #*********************** SUPER FUCKING IMPORTANT ***********************#
+
+RESOURCES += \
+    myres.qrc

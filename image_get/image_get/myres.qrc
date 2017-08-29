@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/iconimages">
+        <file>abouticon.png</file>
+        <file>open-file-icon.png</file>
+        <file>saveicon.png</file>
+        <file>helpicon.png</file>
+    </qresource>
+</RCC>

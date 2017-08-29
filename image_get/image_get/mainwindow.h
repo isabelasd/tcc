@@ -96,6 +96,18 @@ private slots:
     void on_save_clicked();
     void on_editarFicha_clicked();
 
+    void on_processingMethod_currentIndexChanged(const QString &arg1);
+
+    void on_pushButton_clicked();
+
+    void on_actionEscolher_novo_diretorio_triggered();
+
+    void on_actionSalvar_triggered();
+
+    void on_actionComo_usar_o_programa_triggered();
+
+    void on_actionSobre_triggered();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;

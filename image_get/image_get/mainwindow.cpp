@@ -4,7 +4,45 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+Mat binary_image, image_gray;
+Mat dst, detected_edges;
 
+int edgeThresh = 1;
+int lowThreshold = 5;
+int const max_lowThreshold = 100;
+int razao = 3;
+int kernel_size = 3;
+
+int dilation_elem = 0;
+int dilation_size = 0;
+int const max_elem = 2;
+int const max_kernel_size = 21;
+
+void on_trackbar( int, void* )
+{
+    blur( image_gray, binary_image, Size(3,3) );
+    Canny( binary_image, binary_image, lowThreshold, lowThreshold*razao, kernel_size );
+      //createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold, CannyThreshold );
+
+
+
+    imshow("window", binary_image) ;
+}
+
+void Dilation( int, void* )
+{
+  int dilation_type;
+  if( dilation_elem == 0 ){ dilation_type = MORPH_RECT; }
+  else if( dilation_elem == 1 ){ dilation_type = MORPH_CROSS; }
+  else if( dilation_elem == 2) { dilation_type = MORPH_ELLIPSE; }
+
+  Mat element = getStructuringElement( dilation_type,
+                                       Size( 2*dilation_size + 1, 2*dilation_size+1 ),
+                                       Point( dilation_size, dilation_size ) );
+  // Apply the dilation operation
+  dilate( binary_image, binary_image, element );
+  imshow( "window", binary_image );
+}
 
 // FIND NICE WAY TO DECLARE LOOKUP TABLE !!! PLEZ :)
 int R_channel[ SCALE_EL ]   = {   0,   2,   6,  18,  44,  90, 153, 216, 253, 244, 195, 131 } ;
@@ -179,6 +217,7 @@ bool MainWindow::fileExists(QString path) {
     return check_file.exists() && check_file.isFile();
 }
 
+// return list of elements of a xml file
 
  QStringList MainWindow::ListElement(QDomElement root, QString tagname, QString attribute)
  {
@@ -199,6 +238,8 @@ bool MainWindow::fileExists(QString path) {
      return entries ;
  }
 
+
+ // update xml file temperature.xml
  void MainWindow::UpdateXML_temperature()
  {
      // xml saving
@@ -275,7 +316,7 @@ bool MainWindow::fileExists(QString path) {
      // get the root element
      QDomElement root = document.firstChildElement();
 
-     // List the photos
+     // save the atributes in a list
      QStringList Foto_S = ListElement(root,"Foto", "Name");
      QStringList Marcador_S = ListElement(root,"Marcador", "Name");
      QStringList y_S = ListElement(root,"Marcador", "y");
@@ -284,6 +325,7 @@ bool MainWindow::fileExists(QString path) {
      QStringList x_S = ListElement(root,"Marcador", "x");
      QStringList central_marker_size_S = ListElement(root,"Marcador", "central_marker_size");
 
+     // fill arrays with value
      for(int i = 0; i < Foto_S.size(); i++) {
          for(int j = 0; j < 6; j++) {
              x_markers[i*6 + j] = x_S[i*6 + j].toInt() ;
@@ -294,6 +336,7 @@ bool MainWindow::fileExists(QString path) {
          }
      }
 
+     // check if the array is filled properly
      for(int i = 0; i < Foto_S.size(); i++) {
               qDebug() << "\n" << Foto_S[i] ;
               for(int j = 0; j < 6; j++) {
@@ -352,6 +395,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui ->spinBox->setEnabled(false);
     ui -> spinBox_2 ->setEnabled(false);
 
+    ui -> actionSalvar->setEnabled(false);
+
     ui->photo_index->setText("Nenhuma foto valida selecionada");
 }
 
@@ -362,19 +407,25 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_diretorio_clicked()
 {
+    // clear the graphics view and scene
+    scene->clear();
+    ui->graphicsView->viewport()->update();
 
+
+    // get the directory of the photos
     dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
                                                     QDir::homePath(),
                                                     QFileDialog::ShowDirsOnly
                                                     | QFileDialog::DontResolveSymlinks);
 
-
+    // if not an empty directory,
     if(dir != "")
     {
         QDir image_folder(dir);
         image_folder.setNameFilters( QStringList() << "*.png" ) ;
         image_list = image_folder.entryList() ;
 
+        // if the directory doesnt have exactly 12 pictures, error
         if(image_list.size() != PICTURE_NUMBER){
             QMessageBox::warning(this, "Numero de Imagens Incorreto", "Selecionar diretorio com 12 imagens .png") ;
             ui->graphicsView->setVisible(false);
@@ -395,9 +446,12 @@ void MainWindow::on_diretorio_clicked()
             ui->editarFicha->setEnabled(false);
             ui->save->setEnabled(false);
 
+            ui -> actionSalvar->setEnabled(false);
+
             ui->spinBox->setEnabled(false);
             ui->spinBox_2->setEnabled(false);
-    }
+        }
+       // if the directory have 12 pictures, continue
 
         else {
             ui->graphicsView->setVisible(true);
@@ -408,7 +462,7 @@ void MainWindow::on_diretorio_clicked()
 
             //----------
             // checking if xml file exists
-            // xml initialization
+            // xml initialization. if doesnt exists, create a new one
             if (!fileExists(dir+"/temperatura.xml"))
             {
                 // initialize variables
@@ -438,6 +492,7 @@ void MainWindow::on_diretorio_clicked()
                 UpdateXML_temperature();
 
             }
+           // otherwise read the xml file
 
             ReadXML_temperature();
 
@@ -451,11 +506,7 @@ void MainWindow::on_diretorio_clicked()
             // add markers
             // markers are displayed in increasing number sequence, from left to right
 
-            //central marker
-            QBrush blackBrush(Qt::black);
-            QPen blackpen(Qt::black);
-            blackpen.setWidth(0);
-
+            // mark 1 - central marker
             mark1 = new squaremarker();
             mark1->setX(x_markers[image_number*6]) ;
             mark1->setY(y_markers[image_number*6]) ;
@@ -463,6 +514,7 @@ void MainWindow::on_diretorio_clicked()
             mark1->h_m = size_bigger[image_number*6] ;
             scene->addItem(mark1);
 
+            // fingers markers, starting from little finger to thumb
             mark2 = new squaremarker();
             mark2->setX(x_markers[image_number*6+1]) ;
             mark2->setY(y_markers[image_number*6+1]) ;
@@ -502,11 +554,15 @@ void MainWindow::on_diretorio_clicked()
             path_att = dir + "/" + image_list.at(image_number);
             path_att_cv  = path_att.toUtf8().constData() ;
 
+            // update GUI values and enable buttons
+
             ui -> anterior -> setEnabled(true);
             ui -> proximo -> setEnabled(true);
             ui -> save -> setEnabled(true);
             ui -> temperature -> setEnabled(true);
             ui -> editarFicha -> setEnabled(true);
+
+            ui -> actionSalvar -> setEnabled(true);
 
             ui -> spinBox -> setEnabled(true);
             ui -> spinBox -> setValue(size_bigger[6 * image_number]) ;
@@ -520,6 +576,34 @@ void MainWindow::on_diretorio_clicked()
             ui->label_15->setText(QString::number(temp_values[image_number*6 + 4]) + " °C" );
             ui->label_16->setText(QString::number(temp_values[image_number*6 + 5]) + " °C" );
         }
+    }
+
+    else {
+        QMessageBox::warning(this, "Diretorio Vazio", "Por favor, selecione um diretorio valido com 12 imagens .png") ;
+        ui->graphicsView->setVisible(false);
+
+        ui->label_11->setText("NA");
+        ui->label_12->setText("NA");
+        ui->label_13->setText("NA");
+        ui->label_14->setText("NA");
+        ui->label_15->setText("NA");
+        ui->label_16->setText("NA");
+
+        ui->photo_index->setStyleSheet("color: red");
+        ui->photo_index->setText("Diretorio Vazio! Por favor, selecione um \ndiretorio com 12 fotos em formato .png");
+
+        ui->anterior->setEnabled(false);
+        ui->proximo->setEnabled(false);
+        ui->temperature->setEnabled(false);
+        ui->editarFicha->setEnabled(false);
+        ui->save->setEnabled(false);
+
+        ui -> actionSalvar->setEnabled(false);
+
+        ui->spinBox->setEnabled(false);
+        ui->spinBox_2->setEnabled(false);
+
+
     }
 }
 
@@ -658,7 +742,7 @@ void MainWindow::on_temperature_clicked()
     temp_values[image_number*6+4] = temperature_interp[index_min5];
     temp_values[image_number*6+5] = temperature_interp[index_min6];
 
-    // set mark x and y values to get markers position
+    // set mark x and y values to get markers position and its size
     x_markers[image_number*6]   = mark1 -> sceneBoundingRect().topLeft().x();
     x_markers[image_number*6+1] = mark2 -> sceneBoundingRect().topLeft().x();
     x_markers[image_number*6+2] = mark3 -> sceneBoundingRect().topLeft().x();
@@ -688,6 +772,7 @@ void MainWindow::on_temperature_clicked()
     size_smaller[image_number*6+5] = wf;
 
 
+    // update xml file with new values
     UpdateXML_temperature();
 
    //-----------------------------------------------------
@@ -697,6 +782,7 @@ void MainWindow::on_temperature_clicked()
 void MainWindow::on_spinBox_valueChanged(int arg1)
 {
 
+    // update markers position array
     x_markers[image_number*6]   = mark1 -> sceneBoundingRect().topLeft().x();
     x_markers[image_number*6+1] = mark2 -> sceneBoundingRect().topLeft().x();
     x_markers[image_number*6+2] = mark3 -> sceneBoundingRect().topLeft().x();
@@ -714,7 +800,7 @@ void MainWindow::on_spinBox_valueChanged(int arg1)
     wc = arg1 ;
     hc = arg1 ;
 
-    // redraw marker and set reference to 0, 0 (scene reference). this is important, otherwise doesnt work.
+    // redraw marker . this is important, otherwise doesnt work.
 
     mark1->setX(x_markers[image_number*6]) ;
     mark1->setY(y_markers[image_number*6]) ;
@@ -730,6 +816,7 @@ void MainWindow::on_spinBox_valueChanged(int arg1)
 //spinbox used for smaller markers. updates the size of the markers
 void MainWindow::on_spinBox_2_valueChanged(int arg1)
 {
+    // update markers position array
     x_markers[image_number*6]   = mark1 -> sceneBoundingRect().topLeft().x();
     x_markers[image_number*6+1] = mark2 -> sceneBoundingRect().topLeft().x();
     x_markers[image_number*6+2] = mark3 -> sceneBoundingRect().topLeft().x();
@@ -746,6 +833,8 @@ void MainWindow::on_spinBox_2_valueChanged(int arg1)
 
     wf = arg1 ;
     hf = arg1 ;
+
+    // redraw marker . this is important, otherwise doesnt work.
 
     mark2->setX(x_markers[image_number*6+1]) ;
     mark2->setY(y_markers[image_number*6+1]) ;
@@ -785,6 +874,38 @@ void MainWindow::on_spinBox_2_valueChanged(int arg1)
 
 void MainWindow::on_proximo_clicked()
 {
+    // set mark x and y values to get markers position and its size
+    x_markers[image_number*6]   = mark1 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+1] = mark2 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+2] = mark3 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+3] = mark4 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+4] = mark5 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+5] = mark6 -> sceneBoundingRect().topLeft().x();
+
+    y_markers[image_number*6]   = mark1 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+1] = mark2 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+2] = mark3 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+3] = mark4 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+4] = mark5 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+5] = mark6 -> sceneBoundingRect().topLeft().y();
+
+    size_bigger[image_number*6]   = wc;
+    size_bigger[image_number*6+1] = wc;
+    size_bigger[image_number*6+2] = wc;
+    size_bigger[image_number*6+3] = wc;
+    size_bigger[image_number*6+4] = wc;
+    size_bigger[image_number*6+5] = wc;
+
+    size_smaller[image_number*6]   = wf;
+    size_smaller[image_number*6+1] = wf;
+    size_smaller[image_number*6+2] = wf;
+    size_smaller[image_number*6+3] = wf;
+    size_smaller[image_number*6+4] = wf;
+    size_smaller[image_number*6+5] = wf;
+
+    on_temperature_clicked();
+
+    // create a new scene
     scene->removeItem(mark1);
     scene->removeItem(mark2);
     scene->removeItem(mark3);
@@ -812,9 +933,7 @@ void MainWindow::on_proximo_clicked()
 
     ui->photo_index->setText("Foto " + QString::number(image_number));
 
-    QPen blackpen(Qt::black);
-    blackpen.setWidth(0);
-    // central marker
+    // redraw markers
 
     mark1 = new squaremarker();
     mark1->setX(x_markers[image_number*6]) ;
@@ -858,8 +977,11 @@ void MainWindow::on_proximo_clicked()
     mark6->h_m = size_smaller[image_number*6 + 5] ;
     scene->addItem(mark6);
 
+    // updates GUI values
     ui->spinBox->setValue(size_bigger[image_number*6]);
     ui->spinBox_2->setValue(size_smaller[image_number*6]);
+
+
 
     ui->label_11->setText(QString::number(temp_values[image_number*6]) + " °C" );
     ui->label_12->setText(QString::number(temp_values[image_number*6 + 1]) + " °C" );
@@ -871,6 +993,40 @@ void MainWindow::on_proximo_clicked()
 
 void MainWindow::on_anterior_clicked()
 {
+    // set mark x and y values to get markers position and its size
+    x_markers[image_number*6]   = mark1 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+1] = mark2 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+2] = mark3 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+3] = mark4 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+4] = mark5 -> sceneBoundingRect().topLeft().x();
+    x_markers[image_number*6+5] = mark6 -> sceneBoundingRect().topLeft().x();
+
+    y_markers[image_number*6]   = mark1 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+1] = mark2 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+2] = mark3 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+3] = mark4 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+4] = mark5 -> sceneBoundingRect().topLeft().y();
+    y_markers[image_number*6+5] = mark6 -> sceneBoundingRect().topLeft().y();
+
+    size_bigger[image_number*6]   = wc;
+    size_bigger[image_number*6+1] = wc;
+    size_bigger[image_number*6+2] = wc;
+    size_bigger[image_number*6+3] = wc;
+    size_bigger[image_number*6+4] = wc;
+    size_bigger[image_number*6+5] = wc;
+
+    size_smaller[image_number*6]   = wf;
+    size_smaller[image_number*6+1] = wf;
+    size_smaller[image_number*6+2] = wf;
+    size_smaller[image_number*6+3] = wf;
+    size_smaller[image_number*6+4] = wf;
+    size_smaller[image_number*6+5] = wf;
+
+    // update xml
+    on_temperature_clicked();
+
+    // goes to next pic
+
     scene->removeItem(mark1);
     scene->removeItem(mark2);
     scene->removeItem(mark3);
@@ -945,6 +1101,7 @@ void MainWindow::on_anterior_clicked()
     mark6->h_m = size_smaller[image_number*6 + 5] ;
     scene->addItem(mark6);
 
+    //updates GUI values
     ui->spinBox->setValue(size_bigger[image_number*6]);
     ui->spinBox_2->setValue(size_smaller[image_number*6]);
 
@@ -972,6 +1129,7 @@ void MainWindow::on_save_clicked()
 
     for (int i = 0 ; i < image_list.size() ; i++)
     {
+        // remove all previous markers
         scene->removeItem(mark1);
         scene->removeItem(mark2);
         scene->removeItem(mark3);
@@ -986,9 +1144,7 @@ void MainWindow::on_save_clicked()
         // recreate pixmap
         scene -> addPixmap( path_att );
 
-        QPen blackpen(Qt::black);
-        blackpen.setWidth(0);
-        // central marker
+        // redraw markers
 
         mark1 = new squaremarker();
         mark1->setX(x_markers[i*6]) ;
@@ -1032,10 +1188,12 @@ void MainWindow::on_save_clicked()
         mark6->h_m = size_smaller[i*6 + 5] ;
         scene->addItem(mark6);
 
+        // make a screen shot of the graphics view area
         QPixmap pixMap = this->ui->graphicsView->grab();
 
+        //updates file name
         file_name_saved = file_name_oiginal + QString::number(i);
-
+        // save in a new directory /editadas
         pixMap.save(dir + "/editadas/"  + file_name_saved + ".png");
        // qDebug() << "\nLista editada 1 (" << i << "):" << image_list_save.at(i) ;
     }
@@ -1046,6 +1204,68 @@ void MainWindow::on_save_clicked()
     {
         qDebug() << "\nLista editada 2 (" << i << "):" << image_list_save.at(i) ;
     }*/
+
+
+    //recreate the view like it was when save was clicked
+    // remove all previous markers
+    scene->removeItem(mark1);
+    scene->removeItem(mark2);
+    scene->removeItem(mark3);
+    scene->removeItem(mark4);
+    scene->removeItem(mark5);
+    scene->removeItem(mark6);
+
+    // updates path
+    path_att = dir + "/" + image_list.at(image_number);
+    path_att_cv  = path_att.toUtf8().constData() ;
+
+    // recreate pixmap
+    scene -> addPixmap( path_att );
+
+    // redraw markers
+
+    mark1 = new squaremarker();
+    mark1->setX(x_markers[image_number*6]) ;
+    mark1->setY(y_markers[image_number*6]) ;
+    mark1->w_m = size_bigger[image_number*6] ;
+    mark1->h_m = size_bigger[image_number*6] ;
+    scene->addItem(mark1);
+
+    mark2 = new squaremarker();
+    mark2->setX(x_markers[image_number*6+1]) ;
+    mark2->setY(y_markers[image_number*6+1]) ;
+    mark2->w_m = size_smaller[image_number*6 + 1] ;
+    mark2->h_m = size_smaller[image_number*6 + 1] ;
+    scene->addItem(mark2);
+
+    mark3 = new squaremarker();
+    mark3->setX(x_markers[image_number*6+2]) ;
+    mark3->setY(y_markers[image_number*6+2]) ;
+    mark3->w_m = size_smaller[image_number*6 + 2] ;
+    mark3->h_m = size_smaller[image_number*6 + 2] ;
+    scene->addItem(mark3);
+
+    mark4 = new squaremarker();
+    mark4->setX(x_markers[image_number*6+3]) ;
+    mark4->setY(y_markers[image_number*6+3]) ;
+    mark4->w_m = size_smaller[image_number*6 + 3] ;
+    mark4->h_m = size_smaller[image_number*6 + 3] ;
+    scene->addItem(mark4);
+
+    mark5 = new squaremarker();
+    mark5->setX(x_markers[image_number*6+4]) ;
+    mark5->setY(y_markers[image_number*6+4]) ;
+    mark5->w_m = size_smaller[image_number*6 + 4] ;
+    mark5->h_m = size_smaller[image_number*6 + 4] ;
+    scene->addItem(mark5);
+
+    mark6 = new squaremarker();
+    mark6->setX(x_markers[image_number*6+5]) ;
+    mark6->setY(y_markers[image_number*6+5]) ;
+    mark6->w_m = size_smaller[image_number*6 + 5] ;
+    mark6->h_m = size_smaller[image_number*6 + 5] ;
+    scene->addItem(mark6);
+
 
 }
 
@@ -1058,4 +1278,98 @@ void MainWindow::on_editarFicha_clicked()
     //qDebug() << myPatient.get_dir_patient() << "\n";
     myPatient.setModal(true);
     myPatient.exec();
+}
+
+void MainWindow::on_processingMethod_currentIndexChanged(const QString &arg1)
+{
+    if(arg1 == "manual") qDebug() << "\n Metodo: " << arg1 ;
+    if(arg1 == "metodo1") qDebug() << "\n Metodo: " << arg1 ;
+    if(arg1 == "metodo2") qDebug() << "\n Metodo: " << arg1 ;
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    image = imread( "C:/Users/Isabela/Documents/fotos_editadasRGB/IR_04302.png" );
+
+    // draw markers
+    //rectangle(image,Point(coordinates[0],coordinates[1]), Point(coordinates[2],coordinates[3]), Scalar(0,0,0), 1);
+    //rectangle(image,Point(coordinates[4],coordinates[5]), Point(coordinates[6],coordinates[7]), Scalar(0,0,0), 1);
+    //rectangle(image,Point(coordinates[8],coordinates[9]), Point(coordinates[10],coordinates[11]), Scalar(0,0,0), 1);
+    //rectangle(image,Point(coordinates[12],coordinates[13]), Point(coordinates[14],coordinates[15]), Scalar(0,0,0), 1);
+    //rectangle(image,Point(coordinates[16],coordinates[17]), Point(coordinates[18],coordinates[19]), Scalar(0,0,0), 1);
+    //rectangle(image,Point(coordinates[20],coordinates[21]), Point(coordinates[22],coordinates[23]), Scalar(0,0,0), 1);
+
+     // -----------------------
+    // Gray scale
+    Mat image_gray(image.size(),CV_8UC1);
+    //Mat binary_image ;
+
+    cvtColor( image, image_gray, CV_BGR2GRAY );
+
+    Mat cdst ;
+
+
+    namedWindow("window", CV_WINDOW_AUTOSIZE );
+
+    //createTrackbar( "Min Threshold:", "window", &lowThreshold, max_lowThreshold, on_trackbar );
+
+    //Canny( image_gray, binary_image, 50, 50*3, 3 );
+      //createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold, CannyThreshold );
+    //blur( image_gray, binary_image, Size(9,9) );
+    Canny( image, binary_image, 50, 200, 3 );
+    cvtColor(binary_image, cdst, CV_GRAY2BGR);
+    /*
+     * createTrackbar( "Element:\n 0: Rect \n 1: Cross \n 2: Ellipse", "window",
+                      &dilation_elem, max_elem,
+                      Dilation );
+
+    //createTrackbar( "Kernel size:\n 2n +1", "window",
+                      &dilation_size, max_kernel_size,
+                      Dilation );
+    Dilation( 0, 0 );
+    */
+
+    vector<Vec2f> lines;
+    HoughLines(binary_image, lines, 1, CV_PI/180, 30, 0, 0 );
+
+    for( size_t i = 0; i < lines.size(); i++ )
+    {
+      float rho = lines[i][0], theta = lines[i][1];
+      Point pt1, pt2;
+      double a = cos(theta), b = sin(theta);
+      double x0 = a*rho, y0 = b*rho;
+      pt1.x = cvRound(x0 + 1000*(-b));
+      pt1.y = cvRound(y0 + 1000*(a));
+      pt2.x = cvRound(x0 - 1000*(-b));
+      pt2.y = cvRound(y0 - 1000*(a));
+      line( cdst, pt1, pt2, Scalar(0,0,255), 1, CV_AA);
+    }
+    //imshow("source", image);
+    imshow("window", image);
+
+    //imshow("window", binary_image) ;
+
+}
+
+
+
+void MainWindow::on_actionEscolher_novo_diretorio_triggered()
+{
+    on_diretorio_clicked();
+}
+
+void MainWindow::on_actionSalvar_triggered()
+{
+    on_save_clicked();
+}
+
+
+void MainWindow::on_actionComo_usar_o_programa_triggered()
+{
+    QMessageBox::information(this,"Ajuda","Digitar ajuda aqui");
+}
+
+void MainWindow::on_actionSobre_triggered()
+{
+    QMessageBox::information(this,"Sobre","Digitar sobre os autores aqui");
 }
