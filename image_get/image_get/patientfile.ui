@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>653</width>
-    <height>489</height>
+    <width>666</width>
+    <height>822</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,19 +16,15 @@
   <widget class="QWidget" name="gridLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>80</x>
-     <y>30</y>
-     <width>272</width>
-     <height>201</height>
+     <x>40</x>
+     <y>70</y>
+     <width>551</width>
+     <height>701</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="0">
-     <widget class="QLabel" name="idade_label">
-      <property name="text">
-       <string>Idade</string>
-      </property>
-     </widget>
+    <item row="0" column="2">
+     <widget class="QLineEdit" name="nome_in"/>
     </item>
     <item row="2" column="2">
      <widget class="QComboBox" name="sexo">
@@ -44,7 +40,14 @@
       </item>
      </widget>
     </item>
-    <item row="3" column="2">
+    <item row="1" column="0">
+     <widget class="QLabel" name="idade_label">
+      <property name="text">
+       <string>Idade</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="2">
      <widget class="QComboBox" name="etnia">
       <item>
        <property name="text">
@@ -61,19 +64,33 @@
         <string>Negro</string>
        </property>
       </item>
+      <item>
+       <property name="text">
+        <string>Asiatico</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Outros</string>
+       </property>
+      </item>
      </widget>
     </item>
-    <item row="0" column="2">
-     <widget class="QLineEdit" name="nome_in"/>
-    </item>
-    <item row="3" column="0">
+    <item row="4" column="0">
      <widget class="QLabel" name="etnia_label">
       <property name="text">
        <string>Etnia</string>
       </property>
      </widget>
     </item>
-    <item row="4" column="0">
+    <item row="0" column="0">
+     <widget class="QLabel" name="nome_label">
+      <property name="text">
+       <string>Nome</string>
+      </property>
+     </widget>
+    </item>
+    <item row="16" column="0">
      <widget class="QLabel" name="fumante_label">
       <property name="text">
        <string>Fumante</string>
@@ -87,18 +104,30 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="nome_label">
-      <property name="text">
-       <string>Nome</string>
-      </property>
+    <item row="16" column="2">
+     <widget class="QComboBox" name="fumante">
+      <item>
+       <property name="text">
+        <string>Nunca fumou</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Ex fumante</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Fumou nas ultimas 4 horas</string>
+       </property>
+      </item>
      </widget>
     </item>
     <item row="1" column="2">
      <widget class="QLineEdit" name="idade_in"/>
     </item>
-    <item row="4" column="2">
-     <widget class="QComboBox" name="fumante">
+    <item row="6" column="2">
+     <widget class="QComboBox" name="comboBox_3">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -111,18 +140,686 @@
       </item>
      </widget>
     </item>
+    <item row="7" column="2">
+     <widget class="QComboBox" name="comboBox_4">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="14" column="2">
+     <widget class="QComboBox" name="comboBox_11">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="15" column="2">
+     <widget class="QComboBox" name="comboBox_12">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="19" column="0">
+     <widget class="QLabel" name="label_19">
+      <property name="text">
+       <string>Trabalha quantas horas por dia?</string>
+      </property>
+     </widget>
+    </item>
+    <item row="12" column="0">
+     <widget class="QLabel" name="label_11">
+      <property name="text">
+       <string>Doenca Reumatica</string>
+      </property>
+     </widget>
+    </item>
+    <item row="19" column="2">
+     <widget class="QComboBox" name="comboBox_15">
+      <item>
+       <property name="text">
+        <string>1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>2</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>3</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>4</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>5</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>6</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>7</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>8</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>9</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>10</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>11</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>12</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>13</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>14 ou mais</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="12" column="2">
+     <widget class="QComboBox" name="comboBox_9">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="11" column="2">
+     <widget class="QComboBox" name="comboBox_8">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="9" column="2">
+     <widget class="QComboBox" name="comboBox_6">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="20" column="0">
+     <widget class="QLabel" name="label_20">
+      <property name="text">
+       <string>Dedos sensiveis ao frio?</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="2">
+     <widget class="QComboBox" name="comboBox_5">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Diagnostico de Fenomeno de Raynaud</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="2">
+     <widget class="QComboBox" name="comboBox_2">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="23" column="0">
+     <widget class="QLabel" name="label_23">
+      <property name="text">
+       <string>Se sim, alteracao de cor em apenas uma das maos?</string>
+      </property>
+     </widget>
+    </item>
+    <item row="20" column="2">
+     <widget class="QComboBox" name="comboBox_16">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="12" column="3">
+     <widget class="QLabel" name="label_12">
+      <property name="text">
+       <string>Qual?</string>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="2">
+     <widget class="QComboBox" name="comboBox_7">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="10" column="0">
+     <widget class="QLabel" name="label_9">
+      <property name="text">
+       <string>Alteracao na tireoide</string>
+      </property>
+     </widget>
+    </item>
+    <item row="11" column="0">
+     <widget class="QLabel" name="label_10">
+      <property name="text">
+       <string>Diabetes</string>
+      </property>
+     </widget>
+    </item>
+    <item row="25" column="0">
+     <widget class="QLabel" name="label_25">
+      <property name="text">
+       <string>Labios arroxeados no frio?</string>
+      </property>
+     </widget>
+    </item>
+    <item row="26" column="0">
+     <widget class="QLabel" name="label_26">
+      <property name="text">
+       <string>Temperatura central (em graus Celcius)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="2">
+     <widget class="QComboBox" name="comboBox">
+      <item>
+       <property name="text">
+        <string>Curitiba</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sao Jose dos Pinhais</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Pinhais</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Araucaria</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Almirante Tamandare</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Outra</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="13" column="0">
+     <widget class="QLabel" name="label_13">
+      <property name="text">
+       <string>Medicacao</string>
+      </property>
+     </widget>
+    </item>
+    <item row="13" column="2">
+     <widget class="QComboBox" name="comboBox_10">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="14" column="0">
+     <widget class="QLabel" name="label_15">
+      <property name="text">
+       <string>Maos geladas ou que mudam de cor com o frio na familia</string>
+      </property>
+     </widget>
+    </item>
+    <item row="17" column="2">
+     <widget class="QComboBox" name="comboBox_13">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="17" column="0">
+     <widget class="QLabel" name="label_17">
+      <property name="text">
+       <string>Cafeina nas ultimas 4 horas</string>
+      </property>
+     </widget>
+    </item>
+    <item row="24" column="0">
+     <widget class="QLabel" name="label_24">
+      <property name="text">
+       <string>Dedos amortecidos ou com falta de sensibilidade?</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>Cidade</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0">
+     <widget class="QLabel" name="label_5">
+      <property name="text">
+       <string>Cardiopatia</string>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="0">
+     <widget class="QLabel" name="label_6">
+      <property name="text">
+       <string>Arteriosclerose</string>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="0">
+     <widget class="QLabel" name="label_8">
+      <property name="text">
+       <string>Pressao alta</string>
+      </property>
+     </widget>
+    </item>
+    <item row="13" column="4">
+     <widget class="QLineEdit" name="lineEdit_2"/>
+    </item>
+    <item row="13" column="3">
+     <widget class="QLabel" name="label_14">
+      <property name="text">
+       <string>Qual?</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="0">
+     <widget class="QLabel" name="label_7">
+      <property name="text">
+       <string>Micose, fungo ou lesoes na pele das maos</string>
+      </property>
+     </widget>
+    </item>
+    <item row="21" column="2">
+     <widget class="QComboBox" name="comboBox_17">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="22" column="2">
+     <widget class="QComboBox" name="comboBox_18">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="12" column="4">
+     <widget class="QLineEdit" name="lineEdit"/>
+    </item>
+    <item row="15" column="0">
+     <widget class="QLabel" name="label_16">
+      <property name="text">
+       <string>Doenca reumatica na familia</string>
+      </property>
+     </widget>
+    </item>
+    <item row="18" column="0">
+     <widget class="QLabel" name="label_18">
+      <property name="text">
+       <string>Realizou atividades fisicas no ultimo mes</string>
+      </property>
+     </widget>
+    </item>
+    <item row="18" column="2">
+     <widget class="QComboBox" name="comboBox_14">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="21" column="0">
+     <widget class="QLabel" name="label_21">
+      <property name="text">
+       <string>Dedos mudam de cor no frio?</string>
+      </property>
+     </widget>
+    </item>
+    <item row="22" column="0">
+     <widget class="QLabel" name="label_22">
+      <property name="text">
+       <string>Ficam brancos ou azuis no frio?</string>
+      </property>
+     </widget>
+    </item>
+    <item row="23" column="2">
+     <widget class="QComboBox" name="comboBox_19">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="24" column="2">
+     <widget class="QComboBox" name="comboBox_20">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="25" column="2">
+     <widget class="QComboBox" name="comboBox_21">
+      <item>
+       <property name="text">
+        <string>Nao</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sim</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="26" column="2">
+     <widget class="QComboBox" name="comboBox_22">
+      <item>
+       <property name="text">
+        <string>35</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>35.1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>35.2</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>35.3</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>35.4</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>35.5</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>35.6</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>35.7</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>35.8</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>35.9</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>36</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>36.1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>36.2</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>36.3</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>36.4</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>36.5</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>36.6</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>36.7</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>36.8</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>36.9</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>37</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>37.1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>37.2</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>37.3</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>37.4</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>37.5</string>
+       </property>
+      </item>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>460</x>
-     <y>150</y>
-     <width>160</width>
-     <height>80</height>
+     <x>350</x>
+     <y>790</y>
+     <width>241</width>
+     <height>25</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
      <widget class="QPushButton" name="save">
       <property name="text">
@@ -136,6 +833,48 @@
        <string>Cancelar</string>
       </property>
      </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>10</y>
+     <width>341</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Dados Pessoais</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>40</y>
+     <width>551</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Paciente n</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_27">
+      <property name="text">
+       <string>Data da coleta</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QDateEdit" name="dateEdit"/>
     </item>
    </layout>
   </widget>
