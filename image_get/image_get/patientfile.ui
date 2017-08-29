@@ -24,7 +24,7 @@
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="2">
-     <widget class="QLineEdit" name="nome_in"/>
+     <widget class="QLineEdit" name="nome"/>
     </item>
     <item row="2" column="2">
      <widget class="QComboBox" name="sexo">
@@ -124,10 +124,10 @@
      </widget>
     </item>
     <item row="1" column="2">
-     <widget class="QLineEdit" name="idade_in"/>
+     <widget class="QLineEdit" name="idade"/>
     </item>
     <item row="6" column="2">
-     <widget class="QComboBox" name="comboBox_3">
+     <widget class="QComboBox" name="cardiopatia">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -141,7 +141,7 @@
      </widget>
     </item>
     <item row="7" column="2">
-     <widget class="QComboBox" name="comboBox_4">
+     <widget class="QComboBox" name="arteriosclerose">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -155,7 +155,7 @@
      </widget>
     </item>
     <item row="14" column="2">
-     <widget class="QComboBox" name="comboBox_11">
+     <widget class="QComboBox" name="mao_gelada">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -169,7 +169,7 @@
      </widget>
     </item>
     <item row="15" column="2">
-     <widget class="QComboBox" name="comboBox_12">
+     <widget class="QComboBox" name="historico_reumatica">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -183,21 +183,21 @@
      </widget>
     </item>
     <item row="19" column="0">
-     <widget class="QLabel" name="label_19">
+     <widget class="QLabel" name="trabalho_label">
       <property name="text">
        <string>Trabalha quantas horas por dia?</string>
       </property>
      </widget>
     </item>
     <item row="12" column="0">
-     <widget class="QLabel" name="label_11">
+     <widget class="QLabel" name="reumatica_label">
       <property name="text">
        <string>Doenca Reumatica</string>
       </property>
      </widget>
     </item>
     <item row="19" column="2">
-     <widget class="QComboBox" name="comboBox_15">
+     <widget class="QComboBox" name="hora_trabalho">
       <item>
        <property name="text">
         <string>1</string>
@@ -271,7 +271,7 @@
      </widget>
     </item>
     <item row="12" column="2">
-     <widget class="QComboBox" name="comboBox_9">
+     <widget class="QComboBox" name="reumatica">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -285,7 +285,7 @@
      </widget>
     </item>
     <item row="11" column="2">
-     <widget class="QComboBox" name="comboBox_8">
+     <widget class="QComboBox" name="diabetes">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -299,7 +299,7 @@
      </widget>
     </item>
     <item row="9" column="2">
-     <widget class="QComboBox" name="comboBox_6">
+     <widget class="QComboBox" name="pressao">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -313,14 +313,14 @@
      </widget>
     </item>
     <item row="20" column="0">
-     <widget class="QLabel" name="label_20">
+     <widget class="QLabel" name="sensivel_label">
       <property name="text">
        <string>Dedos sensiveis ao frio?</string>
       </property>
      </widget>
     </item>
     <item row="8" column="2">
-     <widget class="QComboBox" name="comboBox_5">
+     <widget class="QComboBox" name="micose">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -334,14 +334,14 @@
      </widget>
     </item>
     <item row="5" column="0">
-     <widget class="QLabel" name="label_4">
+     <widget class="QLabel" name="raynaud_label">
       <property name="text">
        <string>Diagnostico de Fenomeno de Raynaud</string>
       </property>
      </widget>
     </item>
     <item row="5" column="2">
-     <widget class="QComboBox" name="comboBox_2">
+     <widget class="QComboBox" name="raynaud">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -355,14 +355,14 @@
      </widget>
     </item>
     <item row="23" column="0">
-     <widget class="QLabel" name="label_23">
+     <widget class="QLabel" name="apenas_uma_label">
       <property name="text">
        <string>Se sim, alteracao de cor em apenas uma das maos?</string>
       </property>
      </widget>
     </item>
     <item row="20" column="2">
-     <widget class="QComboBox" name="comboBox_16">
+     <widget class="QComboBox" name="sensibilidade_frio">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -376,14 +376,14 @@
      </widget>
     </item>
     <item row="12" column="3">
-     <widget class="QLabel" name="label_12">
+     <widget class="QLabel" name="reumatica_qual_label">
       <property name="text">
        <string>Qual?</string>
       </property>
      </widget>
     </item>
     <item row="10" column="2">
-     <widget class="QComboBox" name="comboBox_7">
+     <widget class="QComboBox" name="tireoide">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -397,35 +397,35 @@
      </widget>
     </item>
     <item row="10" column="0">
-     <widget class="QLabel" name="label_9">
+     <widget class="QLabel" name="tireoide_label">
       <property name="text">
        <string>Alteracao na tireoide</string>
       </property>
      </widget>
     </item>
     <item row="11" column="0">
-     <widget class="QLabel" name="label_10">
+     <widget class="QLabel" name="diabetes_label">
       <property name="text">
        <string>Diabetes</string>
       </property>
      </widget>
     </item>
     <item row="25" column="0">
-     <widget class="QLabel" name="label_25">
+     <widget class="QLabel" name="labio_label">
       <property name="text">
        <string>Labios arroxeados no frio?</string>
       </property>
      </widget>
     </item>
     <item row="26" column="0">
-     <widget class="QLabel" name="label_26">
+     <widget class="QLabel" name="temperatura_corporal_label">
       <property name="text">
        <string>Temperatura central (em graus Celcius)</string>
       </property>
      </widget>
     </item>
     <item row="3" column="2">
-     <widget class="QComboBox" name="comboBox">
+     <widget class="QComboBox" name="cidade">
       <item>
        <property name="text">
         <string>Curitiba</string>
@@ -459,14 +459,14 @@
      </widget>
     </item>
     <item row="13" column="0">
-     <widget class="QLabel" name="label_13">
+     <widget class="QLabel" name="medicacao_label">
       <property name="text">
        <string>Medicacao</string>
       </property>
      </widget>
     </item>
     <item row="13" column="2">
-     <widget class="QComboBox" name="comboBox_10">
+     <widget class="QComboBox" name="medicacao_S_N">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -480,14 +480,14 @@
      </widget>
     </item>
     <item row="14" column="0">
-     <widget class="QLabel" name="label_15">
+     <widget class="QLabel" name="mao_gelada_label">
       <property name="text">
        <string>Maos geladas ou que mudam de cor com o frio na familia</string>
       </property>
      </widget>
     </item>
     <item row="17" column="2">
-     <widget class="QComboBox" name="comboBox_13">
+     <widget class="QComboBox" name="cafeina">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -501,66 +501,66 @@
      </widget>
     </item>
     <item row="17" column="0">
-     <widget class="QLabel" name="label_17">
+     <widget class="QLabel" name="cafeina_label">
       <property name="text">
        <string>Cafeina nas ultimas 4 horas</string>
       </property>
      </widget>
     </item>
     <item row="24" column="0">
-     <widget class="QLabel" name="label_24">
+     <widget class="QLabel" name="amortecido_label">
       <property name="text">
        <string>Dedos amortecidos ou com falta de sensibilidade?</string>
       </property>
      </widget>
     </item>
     <item row="3" column="0">
-     <widget class="QLabel" name="label_3">
+     <widget class="QLabel" name="cidade_label">
       <property name="text">
        <string>Cidade</string>
       </property>
      </widget>
     </item>
     <item row="6" column="0">
-     <widget class="QLabel" name="label_5">
+     <widget class="QLabel" name="cardiopatia_label">
       <property name="text">
        <string>Cardiopatia</string>
       </property>
      </widget>
     </item>
     <item row="7" column="0">
-     <widget class="QLabel" name="label_6">
+     <widget class="QLabel" name="arteriosclerose_label">
       <property name="text">
        <string>Arteriosclerose</string>
       </property>
      </widget>
     </item>
     <item row="9" column="0">
-     <widget class="QLabel" name="label_8">
+     <widget class="QLabel" name="pressao_alta_label">
       <property name="text">
        <string>Pressao alta</string>
       </property>
      </widget>
     </item>
     <item row="13" column="4">
-     <widget class="QLineEdit" name="lineEdit_2"/>
+     <widget class="QLineEdit" name="medicamento"/>
     </item>
     <item row="13" column="3">
-     <widget class="QLabel" name="label_14">
+     <widget class="QLabel" name="medicacao_qual_label">
       <property name="text">
        <string>Qual?</string>
       </property>
      </widget>
     </item>
     <item row="8" column="0">
-     <widget class="QLabel" name="label_7">
+     <widget class="QLabel" name="micose_label">
       <property name="text">
        <string>Micose, fungo ou lesoes na pele das maos</string>
       </property>
      </widget>
     </item>
     <item row="21" column="2">
-     <widget class="QComboBox" name="comboBox_17">
+     <widget class="QComboBox" name="cor_frio">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -574,7 +574,7 @@
      </widget>
     </item>
     <item row="22" column="2">
-     <widget class="QComboBox" name="comboBox_18">
+     <widget class="QComboBox" name="branco_azul">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -588,24 +588,24 @@
      </widget>
     </item>
     <item row="12" column="4">
-     <widget class="QLineEdit" name="lineEdit"/>
+     <widget class="QLineEdit" name="reumatica_2"/>
     </item>
     <item row="15" column="0">
-     <widget class="QLabel" name="label_16">
+     <widget class="QLabel" name="historico_reumatica_label">
       <property name="text">
        <string>Doenca reumatica na familia</string>
       </property>
      </widget>
     </item>
     <item row="18" column="0">
-     <widget class="QLabel" name="label_18">
+     <widget class="QLabel" name="atividade_fisica_label">
       <property name="text">
        <string>Realizou atividades fisicas no ultimo mes</string>
       </property>
      </widget>
     </item>
     <item row="18" column="2">
-     <widget class="QComboBox" name="comboBox_14">
+     <widget class="QComboBox" name="atividade_fisica">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -619,21 +619,21 @@
      </widget>
     </item>
     <item row="21" column="0">
-     <widget class="QLabel" name="label_21">
+     <widget class="QLabel" name="cor_frio_label">
       <property name="text">
        <string>Dedos mudam de cor no frio?</string>
       </property>
      </widget>
     </item>
     <item row="22" column="0">
-     <widget class="QLabel" name="label_22">
+     <widget class="QLabel" name="branco_azul_label">
       <property name="text">
        <string>Ficam brancos ou azuis no frio?</string>
       </property>
      </widget>
     </item>
     <item row="23" column="2">
-     <widget class="QComboBox" name="comboBox_19">
+     <widget class="QComboBox" name="uma_mao_so">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -647,7 +647,7 @@
      </widget>
     </item>
     <item row="24" column="2">
-     <widget class="QComboBox" name="comboBox_20">
+     <widget class="QComboBox" name="amortecido">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -661,7 +661,7 @@
      </widget>
     </item>
     <item row="25" column="2">
-     <widget class="QComboBox" name="comboBox_21">
+     <widget class="QComboBox" name="labio_roxo">
       <item>
        <property name="text">
         <string>Nao</string>
@@ -675,7 +675,7 @@
      </widget>
     </item>
     <item row="26" column="2">
-     <widget class="QComboBox" name="comboBox_22">
+     <widget class="QComboBox" name="temperatura_corporal">
       <item>
        <property name="text">
         <string>35</string>
