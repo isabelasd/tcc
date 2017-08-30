@@ -18,6 +18,78 @@ int dilation_size = 0;
 int const max_elem = 2;
 int const max_kernel_size = 21;
 
+
+
+
+Mat frame , frame_threshold;
+Mat image2, newImage;
+
+void on_high_r_thresh_trackbar(int, void *);
+void on_high_g_thresh_trackbar(int, void *);
+void on_high_b_thresh_trackbar(int, void *);
+
+void on_low_r_thresh_trackbar(int, void *);
+void on_low_g_thresh_trackbar(int, void *);
+void on_low_b_thresh_trackbar(int, void *);
+
+int low_r=0, low_g=0, low_b=0;
+int high_r=1, high_g=1, high_b=1;
+
+
+void on_low_r_thresh_trackbar(int, void *)
+{
+    low_r = min(high_r-1, low_r);
+    setTrackbarPos("Low R","Object Detection", low_r);
+
+    inRange(newImage,Scalar(low_b,low_g,low_r), Scalar(high_b,high_g,high_r),frame_threshold);
+
+    imshow("Object Detection",frame_threshold);
+}
+void on_high_r_thresh_trackbar(int, void *)
+{
+    high_r = max(high_r, low_r+1);
+    setTrackbarPos("High R", "Object Detection", high_r);
+
+    inRange(newImage,Scalar(low_b,low_g,low_r), Scalar(high_b,high_g,high_r),frame_threshold);
+    imshow("Object Detection",frame_threshold);
+}
+void on_low_g_thresh_trackbar(int, void *)
+{
+    low_g = min(high_g-1, low_g);
+    setTrackbarPos("Low G","Object Detection", low_g);
+
+    inRange(newImage,Scalar(low_b,low_g,low_r), Scalar(high_b,high_g,high_r),frame_threshold);
+    imshow("Object Detection",frame_threshold);
+}
+void on_high_g_thresh_trackbar(int, void *)
+{
+    high_g = max(high_g, low_g+1);
+    setTrackbarPos("High G", "Object Detection", high_g);
+
+    inRange(newImage,Scalar(low_b,low_g,low_r), Scalar(high_b,high_g,high_r),frame_threshold);
+    imshow("Object Detection",frame_threshold);
+}
+void on_low_b_thresh_trackbar(int, void *)
+{
+    low_b= min(high_b-1, low_b);
+    setTrackbarPos("Low B","Object Detection", low_b);
+
+    inRange(newImage,Scalar(low_b,low_g,low_r), Scalar(high_b,high_g,high_r),frame_threshold);
+    imshow("Object Detection",frame_threshold);
+}
+void on_high_b_thresh_trackbar(int, void *)
+{
+    high_b = max(high_b, low_b+1);
+    setTrackbarPos("High B", "Object Detection", high_b);
+
+    inRange(newImage,Scalar(low_b,low_g,low_r), Scalar(high_b,high_g,high_r),frame_threshold);
+    imshow("Object Detection",frame_threshold);
+}
+
+
+
+
+
 void on_trackbar( int, void* )
 {
     blur( image_gray, binary_image, Size(3,3) );
@@ -43,6 +115,14 @@ void Dilation( int, void* )
   dilate( binary_image, binary_image, element );
   imshow( "window", binary_image );
 }
+
+
+
+
+
+// -- end of image processing
+
+
 
 // FIND NICE WAY TO DECLARE LOOKUP TABLE !!! PLEZ :)
 int R_channel[ SCALE_EL ]   = {   0,   2,   6,  18,  44,  90, 153, 216, 253, 244, 195, 131 } ;
@@ -1280,6 +1360,7 @@ void MainWindow::on_editarFicha_clicked()
     myPatient.exec();
 }
 
+// choose markers location method
 void MainWindow::on_processingMethod_currentIndexChanged(const QString &arg1)
 {
     if(arg1 == "manual") qDebug() << "\n Metodo: " << arg1 ;
@@ -1287,9 +1368,13 @@ void MainWindow::on_processingMethod_currentIndexChanged(const QString &arg1)
     if(arg1 == "metodo2") qDebug() << "\n Metodo: " << arg1 ;
 }
 
+
+// IMAGE PROCESSING HERE
 void MainWindow::on_pushButton_clicked()
 {
-    image = imread( "C:/Users/Isabela/Documents/fotos_editadasRGB/IR_04302.png" );
+
+    image = imread( "C:/Users/Isabela/Documents/fotos_editadasRGB/IR_04290.png" );
+    image2 = imread( "C:/Users/Isabela/Documents/fotos_editadasRGB/IR_04359.png" );
 
     // draw markers
     //rectangle(image,Point(coordinates[0],coordinates[1]), Point(coordinates[2],coordinates[3]), Scalar(0,0,0), 1);
@@ -1301,6 +1386,9 @@ void MainWindow::on_pushButton_clicked()
 
      // -----------------------
     // Gray scale
+
+    /*
+     *
     Mat image_gray(image.size(),CV_8UC1);
     //Mat binary_image ;
 
@@ -1316,6 +1404,9 @@ void MainWindow::on_pushButton_clicked()
     //Canny( image_gray, binary_image, 50, 50*3, 3 );
       //createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold, CannyThreshold );
     //blur( image_gray, binary_image, Size(9,9) );
+
+
+
     Canny( image, binary_image, 50, 200, 3 );
     cvtColor(binary_image, cdst, CV_GRAY2BGR);
     /*
@@ -1327,7 +1418,7 @@ void MainWindow::on_pushButton_clicked()
                       &dilation_size, max_kernel_size,
                       Dilation );
     Dilation( 0, 0 );
-    */
+
 
     vector<Vec2f> lines;
     HoughLines(binary_image, lines, 1, CV_PI/180, 30, 0, 0 );
@@ -1345,9 +1436,72 @@ void MainWindow::on_pushButton_clicked()
       line( cdst, pt1, pt2, Scalar(0,0,255), 1, CV_AA);
     }
     //imshow("source", image);
-    imshow("window", image);
+   // imshow("window", image);
 
-    //imshow("window", binary_image) ;
+    imshow("window", binary_image) ;
+    *
+    * *
+    */
+
+
+    //hconcat(image, image2, newImage);
+
+     namedWindow("Object Detection", CV_WINDOW_AUTOSIZE );
+     namedWindow("Original", CV_WINDOW_AUTOSIZE );
+     frame = image;
+        //-- Trackbars to set thresholds for RGB values
+     /*createTrackbar("Low R","Object Detection", &low_r, 255, on_low_r_thresh_trackbar);
+        createTrackbar("High R","Object Detection", &high_r, 255, on_high_r_thresh_trackbar);
+        createTrackbar("Low G","Object Detection", &low_g, 255, on_low_g_thresh_trackbar);
+        createTrackbar("High G","Object Detection", &high_g, 255, on_high_g_thresh_trackbar);
+        createTrackbar("Low B","Object Detection", &low_b, 255, on_low_b_thresh_trackbar);
+        createTrackbar("High B","Object Detection", &high_b, 255, on_high_b_thresh_trackbar);
+*/
+
+     // begin of hand segmentation
+
+     // color threasholding. these values were obtained empirically using trackbars
+     inRange(image,Scalar(0,128,0), Scalar(255,239,174),frame_threshold);
+
+     // invert image
+     bitwise_not ( frame_threshold, frame_threshold );
+
+     // contours
+     vector<vector<Point> > contours;
+     vector<Vec4i> hierarchy;
+     RNG rng(12345);
+     findContours( frame_threshold, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+
+     // convex hull
+
+     // Find the convex hull object for each contour
+        vector<vector<Point> >hull( contours.size() );
+        for( int i = 0; i < contours.size(); i++ )
+        {
+            convexHull( Mat(contours[i]), hull[i], false );
+        }
+
+
+
+
+     Mat drawing = Mat::zeros( frame_threshold.size(), CV_8UC3 );
+        for( int i = 0; i< contours.size(); i++ )
+           {
+             Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+             drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+             drawContours( drawing, hull, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+           }
+
+        /// Show in a window
+        namedWindow( "Hull demo", WINDOW_AUTOSIZE );
+        imshow( "Hull demo", drawing );
+
+
+     imshow("Object Detection",frame_threshold);
+
+
+     imshow("Original",image);
 
 }
 
