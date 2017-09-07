@@ -7,6 +7,8 @@
 Mat binary_image, image_gray;
 Mat dst, detected_edges;
 
+Mat cropped,cropped_new,cropped_blur, dilated, erosion_dst;
+
 int edgeThresh = 1;
 int lowThreshold = 5;
 int const max_lowThreshold = 100;
@@ -15,6 +17,8 @@ int kernel_size = 3;
 
 int dilation_elem = 0;
 int dilation_size = 0;
+int erosion_elem = 0;
+int erosion_size = 0;
 int const max_elem = 2;
 int const max_kernel_size = 21;
 
@@ -101,6 +105,266 @@ void on_trackbar( int, void* )
     imshow("window", binary_image) ;
 }
 
+bool compareContourAreas ( std::vector<cv::Point> contour1, std::vector<cv::Point> contour2 )
+{
+    double i = fabs( contourArea(cv::Mat(contour1)) );
+    double j = fabs( contourArea(cv::Mat(contour2)) );
+    return ( i < j );
+}
+
+int findBiggestContour(vector<vector<Point> > contours)
+{
+    int indexOfBiggestContour = -1;
+    int sizeOfBiggestContour = 0;
+
+    for (int i = 0; i < contours.size(); i++){
+        if(contours[i].size() > sizeOfBiggestContour){
+            sizeOfBiggestContour = contours[i].size();
+            indexOfBiggestContour = i;
+        }
+    }
+    return indexOfBiggestContour;
+}
+
+void Erosion (int, void*)
+{
+
+    int erosion_type;
+      if( erosion_elem == 0 ){ erosion_type = MORPH_RECT; }
+      else if( erosion_elem == 1 ){ erosion_type = MORPH_CROSS; }
+      else if( erosion_elem == 2) { erosion_type = MORPH_ELLIPSE; }
+
+      Mat element = getStructuringElement( erosion_type,
+                           Size( 2*erosion_size + 1, 2*erosion_size+1 ),
+                           Point( erosion_size, erosion_size ) );
+
+      /// Apply the erosion operation
+      erode( dilated, erosion_dst, element );
+      imshow( "canny_image", erosion_dst );
+
+      // contours
+      vector<vector<Point> > contours;
+      vector<Vec4i> hierarchy;
+      RNG rng(12345);
+      findContours( erosion_dst, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+      // begin of teest
+
+
+
+      vector<vector<Point>> hull( contours.size() );
+      vector<vector<Point>> hullsI( contours.size() );
+      vector<vector<Point>> contours_poly( contours.size() );
+      vector<vector<Vec4i>> defects( contours.size()) ;
+      Point2f rect_points[4];
+      vector<RotatedRect> minRect( contours.size() );
+      vector<Rect> boundRect( contours.size() );
+
+      Mat frame2 = Mat::zeros( erosion_dst.size(), CV_8UC3 );
+      int largest_contour_index;
+      largest_contour_index = findBiggestContour(contours);
+
+      for( int i = 0; i < contours.size(); i++ )
+           {
+               convexHull( Mat(contours[i]), hull[i], false );
+               convexHull( Mat(contours[i]), hullsI[i], true );
+               //convexityDefects(Mat(contours[i]),hullsI[i], defects[i]);
+
+                  if(largest_contour_index == i)
+                     {
+                       // minRect[i] = minAreaRect( Mat(contours[i]) );
+
+                       //draw contour of biggest object
+                        drawContours( frame2, contours,largest_contour_index, CV_RGB(255,255,255), 1, 8, vector<Vec4i>(),0, Point() );
+                      //draw hull of biggesr object
+                        drawContours( frame2, hull, largest_contour_index, CV_RGB(255,0,0), 1, 8, vector<Vec4i>(), 0, Point() );
+
+
+                        approxPolyDP( Mat(hull[i]), contours_poly[i], 2, true );
+                        boundRect[i] = boundingRect( Mat(contours_poly[i]) );
+                        rectangle( frame2, boundRect[i].tl(), boundRect[i].br(), CV_RGB(0,255,0), 1, 8, 0 );
+
+
+
+
+                     }
+           }
+
+        //Point
+      for (int a = 0 ; a < hullsI[largest_contour_index].size() ; a ++ )
+      {
+          circle( frame2, hullsI[largest_contour_index][a], 4, Scalar(0,0,255), 1, 8, 0 );
+
+      }
+
+
+        namedWindow( "trial", WINDOW_AUTOSIZE );
+        imshow( "trial", frame2 );
+
+        for (int a = 0 ; a < contours_poly[largest_contour_index].size() ; a ++ )
+        {
+            circle( frame2, contours_poly[largest_contour_index][a], 4, Scalar(0,255,255), 1, 8, 0 );
+        }
+
+        namedWindow( "trialPoly", WINDOW_AUTOSIZE );
+        imshow( "trialPoly", frame2 );
+
+
+
+        qDebug() <<"\n" << hullsI.size();
+        qDebug() << "\n" << hullsI[largest_contour_index].size() ;
+        qDebug() << "\npolyHull :" << contours_poly[largest_contour_index].size() ;
+
+        //qDebug() <<"\n" << hull.size();
+
+        /*
+        for ( int i = 0 ; i < hull.size() ; i++)
+        {
+            for ( int j = 0 ; j < hull[i].size() ; j++)
+            {
+                qDebug << "\n hull "  <<  QString::number(hull[i][j]) ;
+            }
+        }
+
+        for ( int i = 0 ; i < hullsI.size() ; i++)
+        {
+            for ( int j = 0 ; j < hullsI[i].size() ; j++)
+            {
+                cout << "\n hull si "  <<  QString::number(hullsI[i][j]) ;
+            }
+        }
+
+        */
+
+
+
+
+
+
+
+
+
+
+      // convex hull
+/*
+      // Find the convex hull object for each contour
+         vector<vector<Point> >hull( contours.size() );
+         for( int i = 0; i < contours.size(); i++ )
+         {
+             convexHull( Mat(contours[i]), hull[i], false );
+         }
+
+      Mat drawing = Mat::zeros( erosion_dst.size(), CV_8UC3 );
+         for( int i = 0; i< contours.size(); i++ )
+            {
+              Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+              drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+              drawContours( drawing, hull, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+              //circle( drawing, hull_points[i], 4, Scalar(0,0,255), -1, 8, 0 );
+            }
+
+         // Show in a window
+         namedWindow( "Hull demo", WINDOW_AUTOSIZE );
+         imshow( "Hull demo", drawing );
+
+
+
+
+         */
+       //  ---------------------
+         // largest area trial
+         /*
+         int largest_area=0;
+          int largest_contour_index=0;
+          Rect bounding_rect;
+
+         for( int i = 0; i< hull.size(); i++ ) // iterate through each contour.
+               {
+                double a=contourArea( hull[i],false);  //  Find the area of contour
+                if(a>largest_area){
+                largest_area=a;
+                largest_contour_index=i;                //Store the index of largest contour
+                bounding_rect=boundingRect(hull[i]); // Find the bounding rectangle for biggest contour
+                }
+
+               }
+         Mat drawing_center = Mat::zeros( drawing.size(), CV_8UC3 );
+
+          Scalar color( 0,0,255);
+          drawContours( drawing_center, hull,largest_contour_index, color, CV_FILLED, 8, hierarchy ); // Draw the largest contour using previously stored index.
+          circle( cropped, mc[largest_contour_index], 4, Scalar(255,0,0), -1, 8, 0 );
+          rectangle(drawing, bounding_rect,  Scalar(0,255,0),1, 8,0);
+          //imshow( "src", src );
+          //imshow( "largest Contour", dst );
+
+          // Show in a window
+          namedWindow( "contour", WINDOW_AUTOSIZE );
+          imshow( "contour", drawing_center );
+          imshow("cropped", cropped);
+*/
+
+         // center mass trial
+         //does not work
+
+         /*
+         // sort contours
+         std::sort(hull.begin(), hull.end(), compareContourAreas);
+
+         // grab contours
+         std::vector<cv::Point> biggestContour = hull[hull.size()-1];
+
+         Mat drawing_center = Mat::zeros( drawing.size(), CV_8UC3 );
+
+         Scalar color( 0,0,255);
+         polylines(drawing_center, biggestContour, true, color, 1, 8);
+
+         // Get the moments
+           vector<Moments> mu(hull.size() );
+           for( int i = 0; i < hull.size(); i++ )
+              { mu[i] = moments( hull[i], false ); }
+
+           //  Get the mass centers:
+           vector<Point2f> mc( hull.size() );
+           for( int i = 0; i < hull.size(); i++ )
+              { mc[i] = Point2f( mu[i].m10/mu[i].m00 , mu[i].m01/mu[i].m00 ); }
+
+           circle( drawing_center, mc[hull.size()-1], 4, Scalar(255,0,0), -1, 8, 0 );
+           circle( cropped, mc[hull.size()-1], 4, Scalar(255,0,0), -1, 8, 0 );
+
+          // Show in a window
+          namedWindow( "contour", WINDOW_AUTOSIZE );
+          imshow( "contour", drawing_center );
+          imshow("cropped", cropped);
+*/
+         Mat center_test;
+         int dilation_size = 1 ;
+         Mat element2 = getStructuringElement( MORPH_ELLIPSE,
+                                              Size( 2*dilation_size + 1, 2*dilation_size+1 ),
+                                              Point( dilation_size, dilation_size ) );
+         // Apply the dilation operation
+         dilate( erosion_dst , center_test , element2 );
+         namedWindow( "center", WINDOW_AUTOSIZE );
+         imshow( "center", center_test );
+
+
+         // get the mass center of a black and white image
+         // another try for mass center
+         Moments m = moments(center_test, false);
+         Point p1(m.m10/m.m00, m.m01/m.m00);
+         Point delta(0,40);
+         Point p;
+         p = p1 - delta ;
+
+         circle(center_test, p, 5, Scalar(128,0,0), -1);
+         circle(cropped, p, 5, Scalar(128,0,0), -1);
+         imshow("center", center_test);
+         imshow("cropped", cropped);
+
+
+
+
+}
+
 void Dilation( int, void* )
 {
   int dilation_type;
@@ -112,8 +376,120 @@ void Dilation( int, void* )
                                        Size( 2*dilation_size + 1, 2*dilation_size+1 ),
                                        Point( dilation_size, dilation_size ) );
   // Apply the dilation operation
-  dilate( binary_image, binary_image, element );
-  imshow( "window", binary_image );
+  dilate( cropped_new, dilated, element );
+  imshow( "canny_image", dilated );
+
+  // contours
+  vector<vector<Point> > contours;
+  vector<Vec4i> hierarchy;
+  RNG rng(12345);
+  findContours( dilated, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+
+  // convex hull
+
+  // Find the convex hull object for each contour
+     vector<vector<Point> >hull( contours.size() );
+     for( int i = 0; i < contours.size(); i++ )
+     {
+         convexHull( Mat(contours[i]), hull[i], false );
+     }
+
+     // Get the moments
+       vector<Moments> mu(hull.size() );
+       for( int i = 0; i < hull.size(); i++ )
+          { mu[i] = moments( hull[i], false ); }
+
+       //  Get the mass centers:
+       vector<Point2f> mc( hull.size() );
+       for( int i = 0; i < hull.size(); i++ )
+          { mc[i] = Point2f( mu[i].m10/mu[i].m00 , mu[i].m01/mu[i].m00 ); }
+
+
+
+
+
+  Mat drawing = Mat::zeros( dilated.size(), CV_8UC3 );
+     for( int i = 0; i< contours.size(); i++ )
+        {
+          Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+          drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+          drawContours( drawing, hull, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+          //circle( drawing, mc[i], 4, Scalar(0,0,255), -1, 8, 0 );
+        }
+     //rectangle(drawing,mc[i], Point(coordinates[2],coordinates[3]), Scalar(0,0,0), 1);
+
+
+     /// Show in a window
+     namedWindow( "Hull demo", WINDOW_AUTOSIZE );
+     imshow( "Hull demo", drawing );
+
+}
+
+void canny_thres( int, void* )
+{
+    // Canny detector
+
+      GaussianBlur( cropped, cropped_blur, Size(3,3) , 1, 1 );
+      //blur( cropped, cropped_blur, Size(3,3) );
+
+
+      Canny( cropped_blur, cropped_new, lowThreshold, lowThreshold*razao, kernel_size );
+
+      imshow( "canny_image", cropped_new );
+
+}
+
+void removeBackground( Mat &image, int color_means[])
+{
+
+    int range = 30 ;
+
+    qDebug() << " b: " << QString::number(color_means[0]) << " g: " << QString::number(color_means[1]) << " r: " << QString::number(color_means[2]) ;
+
+    for(int i = 0 ; i < image.cols ; i++ )
+    {
+        for(int j = 0 ; j < image.rows ; j++)
+        {
+            Vec3b auxBGR = image.at<Vec3b>(j,i);
+            //Point3_<uchar>* p = image.ptr<Point3_<uchar> >(y,x);
+            uchar blue = auxBGR.val[0];
+            uchar green = auxBGR.val[1];
+            uchar red = auxBGR.val[2];
+
+            int iblue = (int)blue;
+            int igreen = (int)green;
+            int ired = (int)red;
+
+            auxBGR.val[0] = 0 ;
+            auxBGR.val[1] = 0 ;
+            auxBGR.val[2] = 0 ;
+
+            if (iblue > color_means[0] - range && iblue < color_means[0] + range)
+            {
+                if (igreen > color_means[1] - 30 && igreen < color_means[1] + 30)
+                {
+                    if (ired > color_means[2] - 30 && ired < color_means[2] + 30)
+                    {
+                        auxBGR.val[0] = 255 ;
+                        auxBGR.val[1] = 255 ;
+                        auxBGR.val[2] = 255 ;
+                    }
+                }
+            }
+
+            image.at<Vec3b>(j,i)[0] = auxBGR.val[0];
+            image.at<Vec3b>(j,i)[1] = auxBGR.val[1];
+            image.at<Vec3b>(j,i)[2] = auxBGR.val[2];
+         }
+      }
+
+
+
+
+
+
+
 }
 
 
@@ -1373,16 +1749,180 @@ void MainWindow::on_processingMethod_currentIndexChanged(const QString &arg1)
 void MainWindow::on_pushButton_clicked()
 {
 
-    image = imread( "C:/Users/Isabela/Documents/fotos_editadasRGB/IR_04290.png" );
+    // --------- begin of reading image from path ---------
+
+    QDir image_folder(dir);
+    image_folder.setNameFilters( QStringList() << "*.png" ) ;
+    image_list = image_folder.entryList() ;
+
+    QString path_2 = dir + "/" + image_list.at(image_number);
+
+    string path_cv  = path_2.toUtf8().constData() ;
+
+    image = imread(path_cv);
     image2 = imread( "C:/Users/Isabela/Documents/fotos_editadasRGB/IR_04359.png" );
 
-    // draw markers
-    //rectangle(image,Point(coordinates[0],coordinates[1]), Point(coordinates[2],coordinates[3]), Scalar(0,0,0), 1);
-    //rectangle(image,Point(coordinates[4],coordinates[5]), Point(coordinates[6],coordinates[7]), Scalar(0,0,0), 1);
-    //rectangle(image,Point(coordinates[8],coordinates[9]), Point(coordinates[10],coordinates[11]), Scalar(0,0,0), 1);
-    //rectangle(image,Point(coordinates[12],coordinates[13]), Point(coordinates[14],coordinates[15]), Scalar(0,0,0), 1);
-    //rectangle(image,Point(coordinates[16],coordinates[17]), Point(coordinates[18],coordinates[19]), Scalar(0,0,0), 1);
-    //rectangle(image,Point(coordinates[20],coordinates[21]), Point(coordinates[22],coordinates[23]), Scalar(0,0,0), 1);
+    // --------- end of reading image from path ---------
+
+
+
+    // ---------- begin of crop image ----------
+
+    // Setup a rectangle to define your region of interest
+    cv::Rect myROI(2, 30, 300, 200);
+
+    // Crop the full image to that image contained by the rectangle myROI
+    // Note that this doesn't copy the data
+    cv::Mat croppedRef(image, myROI);
+
+
+    // Copy the data into new matrix
+    croppedRef.copyTo(cropped);
+    namedWindow( "cropped", WINDOW_AUTOSIZE );
+    imshow( "cropped", cropped );
+
+    // ---------- end of crop image ----------
+/*
+    // get BGR mean value inside a rectangle
+
+    rectangle(cropped,Point(3,3), Point(10,190), Scalar(0,0,0), 1);
+
+
+    int intensitymean[3] = {};
+    int intensity_test[3];
+    intensity_test[0] = 0 ; // B
+    intensity_test[1] = 0 ; // G
+    intensity_test[2] = 0 ; // R
+
+    getIntensityBGR(cropped, 3,3,10,190, intensity_test);
+    intensitymean[0] = intensity_test[0];
+    intensitymean[1] = intensity_test[1];
+    intensitymean[2] = intensity_test[2];
+
+    qDebug() << " b: " << QString::number(intensitymean[0]) << " g: " << QString::number(intensitymean[1]) << " r: " << QString::number(intensitymean[2]) ;
+
+
+    removeBackground(cropped, intensitymean);
+
+    Mat cropped_gray(cropped.size(),CV_8UC1);
+
+    cvtColor( cropped, cropped_gray, CV_BGR2GRAY );
+
+    threshold( cropped_gray, cropped, 127, 255,0 );
+
+
+
+  // bitwise_not(cropped,cropped);
+    imshow( "cropped", cropped );
+
+    //threshold( src_gray, dst, threshold_value, max_BINARY_value,threshold_type );
+
+    // contours
+    vector<vector<Point> > contours;
+    vector<Vec4i> hierarchy;
+    RNG rng(12345);
+    findContours( cropped, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+
+    // convex hull
+
+    // Find the convex hull object for each contour
+       vector<vector<Point> >hull( contours.size() );
+       for( int i = 0; i < contours.size(); i++ )
+       {
+           convexHull( Mat(contours[i]), hull[i], false );
+       }
+
+
+
+
+    Mat drawing = Mat::zeros( cropped.size(), CV_8UC3 );
+       for( int i = 0; i< contours.size(); i++ )
+          {
+            Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+            drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+            drawContours( drawing, hull, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+          }
+
+       /// Show in a window
+       namedWindow( "Hull demo", WINDOW_AUTOSIZE );
+       imshow( "Hull demo", drawing );
+
+*/
+
+// end of segmentation using mean threashold.
+
+
+
+
+    // another try using canny
+
+     namedWindow( "canny_image", WINDOW_AUTOSIZE );
+     Mat cropped_binary(cropped.size(), CV_8UC1);
+
+    // detected_edges = cropped ;
+
+     createTrackbar( "cany_thres:", "canny_image", &lowThreshold, max_lowThreshold, canny_thres );
+     canny_thres(0,0);
+
+     // resultado melhor com gaussian e thres de aprox 11 e razao 3
+
+     createTrackbar( "Element dilation :\n 0: Rect \n 1: Cross \n 2: Ellipse", "canny_image",
+                      &dilation_elem, max_elem,
+                      Dilation );
+
+    createTrackbar( "Kernel size dilation:\n 2n +1", "canny_image",
+                      &dilation_size, max_kernel_size,
+                      Dilation );
+    Dilation( 0, 0 );
+
+    /// Create Erosion Trackbar
+     createTrackbar( "Element eroison:\n 0: Rect \n 1: Cross \n 2: Ellipse", "canny_image",
+                 &erosion_elem, max_elem,
+             Erosion );
+
+     createTrackbar( "Kernel size erosion:\n 2n +1", "canny_image",
+             &erosion_size, max_kernel_size,
+             Erosion );
+
+     Erosion (0,0);
+
+
+
+
+     //Canny( cropped, cropped_binary, 50, 200, 3 );
+
+   //  imshow( "canny_image", cropped_binary );
+/*
+     // contours
+     vector<vector<Point> > contours;
+     vector<Vec4i> hierarchy;
+     RNG rng(12345);
+     findContours( cropped_binary, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+     // Find the convex hull object for each contour
+        vector<vector<Point> >hull( contours.size() );
+        for( int i = 0; i < contours.size(); i++ )
+        {
+            convexHull( Mat(contours[i]), hull[i], false );
+        }
+
+     Mat drawing = Mat::zeros( cropped_binary.size(), CV_8UC3 );
+        for( int i = 0; i< contours.size(); i++ )
+           {
+             Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+             drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+             drawContours( drawing, hull, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+           }
+
+        /// Show in a window
+        namedWindow( "contours", WINDOW_AUTOSIZE );
+        imshow( "contours", drawing );
+
+*/
+
+
+    // end of another try using canny
 
      // -----------------------
     // Gray scale
@@ -1446,22 +1986,27 @@ void MainWindow::on_pushButton_clicked()
 
     //hconcat(image, image2, newImage);
 
+
+    /*
      namedWindow("Object Detection", CV_WINDOW_AUTOSIZE );
      namedWindow("Original", CV_WINDOW_AUTOSIZE );
      frame = image;
+     newImage = image;
         //-- Trackbars to set thresholds for RGB values
-     /*createTrackbar("Low R","Object Detection", &low_r, 255, on_low_r_thresh_trackbar);
+     createTrackbar("Low R","Object Detection", &low_r, 255, on_low_r_thresh_trackbar);
         createTrackbar("High R","Object Detection", &high_r, 255, on_high_r_thresh_trackbar);
         createTrackbar("Low G","Object Detection", &low_g, 255, on_low_g_thresh_trackbar);
         createTrackbar("High G","Object Detection", &high_g, 255, on_high_g_thresh_trackbar);
         createTrackbar("Low B","Object Detection", &low_b, 255, on_low_b_thresh_trackbar);
         createTrackbar("High B","Object Detection", &high_b, 255, on_high_b_thresh_trackbar);
-*/
 
+*/
      // begin of hand segmentation
 
      // color threasholding. these values were obtained empirically using trackbars
-     inRange(image,Scalar(0,128,0), Scalar(255,239,174),frame_threshold);
+    // inRange(image,Scalar(0,128,0), Scalar(255,239,174),frame_threshold);
+
+        /*
 
      // invert image
      bitwise_not ( frame_threshold, frame_threshold );
@@ -1498,10 +2043,14 @@ void MainWindow::on_pushButton_clicked()
         imshow( "Hull demo", drawing );
 
 
-     imshow("Object Detection",frame_threshold);
+        */
+
+     //imshow("Object Detection",frame_threshold);
 
 
-     imshow("Original",image);
+     //imshow("Original",image);
+
+
 
 }
 
