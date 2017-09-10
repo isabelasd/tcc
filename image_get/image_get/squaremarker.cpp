@@ -3,6 +3,7 @@
 squaremarker::squaremarker()
 {
     setFlag(QGraphicsItem::ItemIsMovable);
+    setAcceptHoverEvents(true);
 }
 
 QRectF squaremarker::boundingRect() const

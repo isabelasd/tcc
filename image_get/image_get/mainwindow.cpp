@@ -854,6 +854,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui -> actionSalvar->setEnabled(false);
 
     ui->photo_index->setText("Nenhuma foto valida selecionada");
+
+
 }
 
 MainWindow::~MainWindow()
@@ -970,6 +972,7 @@ void MainWindow::on_diretorio_clicked()
             mark1->h_m = size_bigger[image_number*6] ;
             scene->addItem(mark1);
 
+
             // fingers markers, starting from little finger to thumb
             mark2 = new squaremarker();
             mark2->setX(x_markers[image_number*6+1]) ;
@@ -1005,6 +1008,13 @@ void MainWindow::on_diretorio_clicked()
             mark6->w_m = size_smaller[image_number*6+5] ;
             mark6->h_m = size_smaller[image_number*6+5] ;
             scene->addItem(mark6);
+
+            mark1->setToolTip("marcador central");
+            mark2->setToolTip("marcador dedo polegar");
+            mark3->setToolTip("marcador dedo indicador");
+            mark4->setToolTip("marcador dedo medio");
+            mark5->setToolTip("marcador dedo anelar");
+            mark6->setToolTip("marcador dedo minimo");
 
 
             path_att = dir + "/" + image_list.at(image_number);
@@ -1266,6 +1276,8 @@ void MainWindow::on_spinBox_valueChanged(int arg1)
    scene->removeItem(mark1);
    scene->addItem(mark1);
 
+   mark1->setToolTip("marcador central");
+
 }
 
 
@@ -1326,6 +1338,12 @@ void MainWindow::on_spinBox_2_valueChanged(int arg1)
     mark6->h_m = hf ;
     scene->removeItem(mark6);
     scene->addItem(mark6);
+
+    mark2->setToolTip("marcador dedo polegar");
+    mark3->setToolTip("marcador dedo indicador");
+    mark4->setToolTip("marcador dedo medio");
+    mark5->setToolTip("marcador dedo anelar");
+    mark6->setToolTip("marcador dedo minimo");
 }
 
 void MainWindow::on_proximo_clicked()
@@ -1432,6 +1450,13 @@ void MainWindow::on_proximo_clicked()
     mark6->w_m = size_smaller[image_number*6 + 5] ;
     mark6->h_m = size_smaller[image_number*6 + 5] ;
     scene->addItem(mark6);
+
+    mark1->setToolTip("marcador central");
+    mark2->setToolTip("marcador dedo polegar");
+    mark3->setToolTip("marcador dedo indicador");
+    mark4->setToolTip("marcador dedo medio");
+    mark5->setToolTip("marcador dedo anelar");
+    mark6->setToolTip("marcador dedo minimo");
 
     // updates GUI values
     ui->spinBox->setValue(size_bigger[image_number*6]);
@@ -1557,6 +1582,13 @@ void MainWindow::on_anterior_clicked()
     mark6->h_m = size_smaller[image_number*6 + 5] ;
     scene->addItem(mark6);
 
+    mark1->setToolTip("marcador central");
+    mark2->setToolTip("marcador dedo polegar");
+    mark3->setToolTip("marcador dedo indicador");
+    mark4->setToolTip("marcador dedo medio");
+    mark5->setToolTip("marcador dedo anelar");
+    mark6->setToolTip("marcador dedo minimo");
+
     //updates GUI values
     ui->spinBox->setValue(size_bigger[image_number*6]);
     ui->spinBox_2->setValue(size_smaller[image_number*6]);
@@ -1644,6 +1676,8 @@ void MainWindow::on_save_clicked()
         mark6->h_m = size_smaller[i*6 + 5] ;
         scene->addItem(mark6);
 
+
+
         // make a screen shot of the graphics view area
         QPixmap pixMap = this->ui->graphicsView->grab();
 
@@ -1721,6 +1755,13 @@ void MainWindow::on_save_clicked()
     mark6->w_m = size_smaller[image_number*6 + 5] ;
     mark6->h_m = size_smaller[image_number*6 + 5] ;
     scene->addItem(mark6);
+
+    mark1->setToolTip("marcador central");
+    mark2->setToolTip("marcador dedo polegar");
+    mark3->setToolTip("marcador dedo indicador");
+    mark4->setToolTip("marcador dedo medio");
+    mark5->setToolTip("marcador dedo anelar");
+    mark6->setToolTip("marcador dedo minimo");
 
 
 }
