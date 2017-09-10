@@ -10,17 +10,19 @@ Mat dst, detected_edges;
 Mat cropped,cropped_new,cropped_blur, dilated, erosion_dst;
 
 int edgeThresh = 1;
-int lowThreshold = 5;
+int lowThreshold = 11;
 int const max_lowThreshold = 100;
 int razao = 3;
 int kernel_size = 3;
 
-int dilation_elem = 0;
-int dilation_size = 0;
-int erosion_elem = 0;
-int erosion_size = 0;
+int dilation_elem = 2;
+int dilation_size = 3;
+int erosion_elem = 2;
+int erosion_size = 2;
 int const max_elem = 2;
 int const max_kernel_size = 21;
+
+bool warm_hand = false;
 
 
 
@@ -138,7 +140,7 @@ void Erosion (int, void*)
                            Size( 2*erosion_size + 1, 2*erosion_size+1 ),
                            Point( erosion_size, erosion_size ) );
 
-      /// Apply the erosion operation
+      // Apply the erosion operation
       erode( dilated, erosion_dst, element );
       imshow( "canny_image", erosion_dst );
 
@@ -429,11 +431,16 @@ void Dilation( int, void* )
 void canny_thres( int, void* )
 {
     // Canny detector
-
+      if (warm_hand)
+      {
+          lowThreshold = 45 ;
+      }
+      else
+      {
+          lowThreshold = 11 ;
+      }
       GaussianBlur( cropped, cropped_blur, Size(3,3) , 1, 1 );
       //blur( cropped, cropped_blur, Size(3,3) );
-
-
       Canny( cropped_blur, cropped_new, lowThreshold, lowThreshold*razao, kernel_size );
 
       imshow( "canny_image", cropped_new );
@@ -1905,6 +1912,23 @@ void MainWindow::on_pushButton_clicked()
 
      createTrackbar( "cany_thres:", "canny_image", &lowThreshold, max_lowThreshold, canny_thres );
      canny_thres(0,0);
+
+     int get_colors[3] ;
+     get_colors[0] = 0 ; // B
+     get_colors[1] = 0 ; // G
+     get_colors[2] = 0 ; // R
+     getIntensityBGR(cropped, 0 , 0 , cropped.size().width , cropped.size().height , get_colors);
+     if (get_colors[2]  > 35 )
+     {
+         warm_hand = true;
+         //lowThreshold = 45;
+         qDebug() << "imagem quente , R: " << QString::number(get_colors[2]);
+     }
+     else
+     {
+         warm_hand = false ;
+         qDebug() << "imagem fria , R : " << QString::number(get_colors[2]) ;
+     }
 
      // resultado melhor com gaussian e thres de aprox 11 e razao 3
 
