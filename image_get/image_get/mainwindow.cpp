@@ -1110,7 +1110,7 @@ void MainWindow::on_diretorio_clicked()
             scene->addItem(mark1);
 
 
-            // fingers markers, starting from little finger to thumb
+            // fingers markers, starting from thumb to little finger
             mark2 = new squaremarker();
             mark2->setX(x_markers[image_number*6+1]) ;
             mark2->setY(y_markers[image_number*6+1]) ;
@@ -2125,7 +2125,7 @@ void MainWindow::on_pushButton_clicked()
                       //draw contour of biggest object
                        drawContours( frame2, contours,largest_contour_index, CV_RGB(255,255,255), 1, 8, vector<Vec4i>(),0, Point() );
                      //draw hull of biggesr object
-                       drawContours( frame2, hull, largest_contour_index, CV_RGB(255,0,0), 1, 8, vector<Vec4i>(), 0, Point() );
+                       drawContours( frame2, hull, largest_contour_index, CV_RGB(255,255,0), 1, 8, vector<Vec4i>(), 0, Point() );
 
 
                        approxPolyDP( Mat(hull[i]), contours_poly[i], 2, true );
