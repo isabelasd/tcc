@@ -92,8 +92,36 @@ void on_high_b_thresh_trackbar(int, void *)
     imshow("Object Detection",frame_threshold);
 }
 
+void ascending_sort(int array[], int arraySize)
+{
+    int temp;
+    for(int i = 0; i < arraySize; i++)
+    {
+          for(int j = 1; j < arraySize-1; j++)
+          {
+                   if(array[j] > array[i])
+                   {
+                        //swap them
+                       temp = array[i];
+                       array[i] = array[j];
+                       array[j] = temp;
+                    }
+           }
+    }
+
+}
 
 
+
+
+void shift_r(int arr[], int n)
+{
+  int i, temp;
+  temp = arr[0];
+  for (i = 0; i < n-1; i++)
+     arr[i] = arr[i+1];
+  arr[i] = temp;
+}
 
 
 void on_trackbar( int, void* )
@@ -127,6 +155,36 @@ int findBiggestContour(vector<vector<Point> > contours)
     }
     return indexOfBiggestContour;
 }
+
+int findSmallestValue(int array[], int arraySize)
+{
+    int minimumValue = array[0];
+    int minimumIndex = 0 ;
+
+        for ( int i = 1 ; i < arraySize ; i++ )
+        {
+            if ( array[i] < minimumValue )
+            {
+               minimumValue = array[i];
+               minimumIndex = i+1;
+            }
+        }
+    return minimumIndex ;
+}
+
+int getSmallestX(int number1 , int number2)
+{
+    qDebug() << "\n\n number 1 : " << number1 << " number 2 : " << number2 ;
+    if (number1 < number2 )
+    {
+        return 1 ;
+    }
+    else
+    {
+        return 0 ;
+    }
+}
+
 
 void Erosion (int, void*)
 {
@@ -192,16 +250,85 @@ void Erosion (int, void*)
                      }
            }
 
+
+      int PontoX = 0 ;
+      int PontoY = 0 ;
+      int markers_aux_X[hullsI.size()] = {};
+      int markers_aux_Y[hullsI.size()] = {};
         //Point
       for (int a = 0 ; a < hullsI[largest_contour_index].size() ; a ++ )
       {
+          PontoX = hullsI[largest_contour_index][a].x ;
+          PontoY = hullsI[largest_contour_index][a].y ;
+          markers_aux_X[a] = PontoX ;
+          markers_aux_Y[a] = PontoY ;
+          qDebug() << "ponto[" << a << "]: " << markers_aux_X[a] << "," << markers_aux_Y[a];
+
           circle( frame2, hullsI[largest_contour_index][a], 4, Scalar(0,0,255), 1, 8, 0 );
 
       }
 
+      //sort(markers_aux_Y.begin(), markers_aux_Y.end() )
+      //ascending_sort(markers_aux_Y, hullsI[largest_contour_index].size());
+      int index_first = 0 ;
+      index_first = findSmallestValue (markers_aux_Y , hullsI[largest_contour_index].size()) ;
+      qDebug() << "minimum " << index_first ;
+      qDebug() << "numero 1 : " << markers_aux_X[index_first-1] << " numero 2 " << markers_aux_X[index_first] ;
+      int update_index_x = 0 ;
+      update_index_x = getSmallestX (markers_aux_X[index_first-1] , markers_aux_X[index_first] ) ;
+
+      // index of smallest x with y = 0 point
+      index_first = index_first - update_index_x ;
+      qDebug() << ", new minimum : " << index_first ;
+
+      int shift = 0 ;
+      //shift = hullsI[largest_contour_index].size() - index_first ;
+      shift = index_first ;
+      qDebug() << "\nshift : " << shift ;
+
+      int x_aux_2[hullsI[largest_contour_index].size()] ;
+      for (int i = 0 ; i < hullsI[largest_contour_index].size() ; i ++)
+      {
+          x_aux_2[i] = 0 ;
+      }
+
+      for (int i = 0 ; i < hullsI[largest_contour_index].size() ; i ++)
+      {
+          x_aux_2[i] = markers_aux_X[i] ;
+      }
+
+      for ( int i = 0 ; i < 5/*shift*/ ; i ++ )
+      {
+          int a, temp;
+          temp = x_aux_2[0];
+          for (a = 0; a <  hullsI[largest_contour_index].size()-1; a++)
+          {
+             x_aux_2[a] = x_aux_2[a+1];
+          }
+          x_aux_2[a] = temp;
+          //shift_r (markers_aux_X, hullsI[largest_contour_index].size());
+
+        //shift_r (markers_aux_Y, hullsI[largest_contour_index].size());
+      }
+
+
+      for (int a = 0 ; a < hullsI[largest_contour_index].size() ; a ++ )
+      {
+          qDebug() << "ponto[" << a << "]: " << x_aux_2[a] << "," << markers_aux_Y[a];
+      }
+
+     /* for (int a = 0 ; a < hullsI[largest_contour_index].size() ; a ++ )
+      {
+            qDebug() << "ponto[" << a << "]: " << markers_aux_X[a] << "," << markers_aux_Y[a];
+      }
+
+      */
+
+
 
         namedWindow( "trial", WINDOW_AUTOSIZE );
         imshow( "trial", frame2 );
+
 
         for (int a = 0 ; a < contours_poly[largest_contour_index].size() ; a ++ )
         {
@@ -228,15 +355,17 @@ void Erosion (int, void*)
             }
         }
 
+
         for ( int i = 0 ; i < hullsI.size() ; i++)
         {
             for ( int j = 0 ; j < hullsI[i].size() ; j++)
             {
-                cout << "\n hull si "  <<  QString::number(hullsI[i][j]) ;
+                qDebug << "\n hull si "  <<  QString::number(hullsI[i][j]) ;
             }
         }
-
         */
+
+
 
 
 
@@ -430,6 +559,7 @@ void Dilation( int, void* )
 
 void canny_thres( int, void* )
 {
+    // only updates de view when trackbar is again moved.
     // Canny detector
       if (warm_hand)
       {
@@ -1908,11 +2038,7 @@ void MainWindow::on_pushButton_clicked()
      namedWindow( "canny_image", WINDOW_AUTOSIZE );
      Mat cropped_binary(cropped.size(), CV_8UC1);
 
-    // detected_edges = cropped ;
-
-     createTrackbar( "cany_thres:", "canny_image", &lowThreshold, max_lowThreshold, canny_thres );
-     canny_thres(0,0);
-
+     // detect if image is warm or not
      int get_colors[3] ;
      get_colors[0] = 0 ; // B
      get_colors[1] = 0 ; // G
@@ -1930,7 +2056,214 @@ void MainWindow::on_pushButton_clicked()
          qDebug() << "imagem fria , R : " << QString::number(get_colors[2]) ;
      }
 
+    // detected_edges = cropped ;
+
+     if (warm_hand)
+     {
+         lowThreshold = 45 ;
+     }
+     else
+     {
+         lowThreshold = 11 ;
+     }
+
+     // begin of image processing
+
+     // blur and canny
+     GaussianBlur( cropped, cropped_blur, Size(3,3) , 1, 1 );
+     //blur( cropped, cropped_blur, Size(3,3) );
+     Canny( cropped_blur, cropped_new, lowThreshold, lowThreshold*razao, kernel_size );
+     imshow( "canny_image", cropped_new );
+
+
+     Mat element_dilation = getStructuringElement( MORPH_ELLIPSE,
+                          Size( 2*dilation_size + 1, 2*dilation_size+1 ),
+                          Point( dilation_size, dilation_size ) );
+
+     // dilation
+     dilate( cropped_new, dilated, element_dilation );
+     imshow( "canny_image", dilated );
+
+     Mat element_erosion = getStructuringElement( MORPH_ELLIPSE,
+                          Size( 2*erosion_size + 1, 2*erosion_size+1 ),
+                          Point( erosion_size, erosion_size ) );
+
+     // Apply the erosion operation
+     erode( dilated, erosion_dst, element_erosion );
+     imshow( "canny_image", erosion_dst );
+
+     // contours
+     vector<vector<Point> > contours;
+     vector<Vec4i> hierarchy;
+     RNG rng(12345);
+     findContours( erosion_dst, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+     // begin of test to get contours
+
+     vector<vector<Point>> hull( contours.size() );
+     vector<vector<Point>> hullsI( contours.size() );
+     vector<vector<Point>> contours_poly( contours.size() );
+     vector<vector<Vec4i>> defects( contours.size()) ;
+     Point2f rect_points[4];
+     vector<RotatedRect> minRect( contours.size() );
+     vector<Rect> boundRect( contours.size() );
+
+     Mat frame2 = Mat::zeros( erosion_dst.size(), CV_8UC3 );
+     int largest_contour_index;
+     largest_contour_index = findBiggestContour(contours);
+
+     for( int i = 0; i < contours.size(); i++ )
+          {
+              convexHull( Mat(contours[i]), hull[i], false );
+              convexHull( Mat(contours[i]), hullsI[i], true );
+              //convexityDefects(Mat(contours[i]),hullsI[i], defects[i]);
+
+                 if(largest_contour_index == i)
+                    {
+                      // minRect[i] = minAreaRect( Mat(contours[i]) );
+
+                      //draw contour of biggest object
+                       drawContours( frame2, contours,largest_contour_index, CV_RGB(255,255,255), 1, 8, vector<Vec4i>(),0, Point() );
+                     //draw hull of biggesr object
+                       drawContours( frame2, hull, largest_contour_index, CV_RGB(255,0,0), 1, 8, vector<Vec4i>(), 0, Point() );
+
+
+                       approxPolyDP( Mat(hull[i]), contours_poly[i], 2, true );
+                       boundRect[i] = boundingRect( Mat(contours_poly[i]) );
+                       rectangle( frame2, boundRect[i].tl(), boundRect[i].br(), CV_RGB(0,255,0), 1, 8, 0 );
+
+
+
+
+                    }
+          }
+
+
+     int PontoX = 0 ;
+     int PontoY = 0 ;
+     int sizeArray = hullsI[largest_contour_index].size() ;
+     int markers_aux_X[sizeArray] = {};
+     int markers_aux_Y[sizeArray] = {};
+       //Point
+     for (int a = 0 ; a < sizeArray ; a ++ )
+     {
+         PontoX = hullsI[largest_contour_index][a].x ;
+         PontoY = hullsI[largest_contour_index][a].y ;
+         markers_aux_X[a] = PontoX ;
+         markers_aux_Y[a] = PontoY ;
+         qDebug() << "ponto[" << a << "]: " << markers_aux_X[a] << "," << markers_aux_Y[a];
+
+         circle( frame2, hullsI[largest_contour_index][a], 4, Scalar(0,0,255), 1, 8, 0 );
+
+     }
+
+     //sort(markers_aux_Y.begin(), markers_aux_Y.end() )
+     //ascending_sort(markers_aux_Y, hullsI[largest_contour_index].size());
+     int index_first = 0 ;
+     index_first = findSmallestValue (markers_aux_Y , sizeArray) ;
+     qDebug() << "minimum " << index_first ;
+     int update_index_x = 0 ;
+     update_index_x = getSmallestX (markers_aux_X[index_first-1] , markers_aux_X[index_first] ) ;
+
+     // index of smallest x with y = 0 point
+     index_first = index_first - update_index_x ;
+     qDebug() << ", new minimum : " << index_first ;
+
+     int shift = 0 ;
+     //shift = hullsI[largest_contour_index].size() - index_first ;
+     shift = index_first ;
+     qDebug() << "\nshift : " << shift ;
+
+     int x_aux_2[sizeArray] ;
+     int y_aux_2[sizeArray] ;
+     for (int i = 0 ; i < sizeArray ; i ++)
+     {
+         x_aux_2[i] = 0 ;
+         y_aux_2[i] = 0 ;
+     }
+
+     for (int i = 0 ; i < sizeArray ; i ++)
+     {
+         x_aux_2[i] = markers_aux_X[i] ;
+         y_aux_2[i] = markers_aux_Y[i];
+     }
+
+    qDebug() << "\n\n\n\n";
+     for ( int i = 0 ; i < shift ; i ++ )
+     {
+         shift_r (x_aux_2, sizeArray);
+         shift_r (y_aux_2, sizeArray);
+     }
+
+
+     for (int a = 0 ; a < sizeArray ; a ++ )
+     {
+         qDebug() << "ponto[" << a << "]: " << x_aux_2[a] << "," << y_aux_2[a];
+     }
+
+    /* for (int a = 0 ; a < hullsI[largest_contour_index].size() ; a ++ )
+     {
+           qDebug() << "ponto[" << a << "]: " << markers_aux_X[a] << "," << markers_aux_Y[a];
+     }
+
+     */
+
+
+
+       namedWindow( "trial", WINDOW_AUTOSIZE );
+       imshow( "trial", frame2 );
+
+
+       for (int a = 0 ; a < contours_poly[largest_contour_index].size() ; a ++ )
+       {
+           circle( frame2, contours_poly[largest_contour_index][a], 4, Scalar(0,255,255), 1, 8, 0 );
+       }
+
+       namedWindow( "trialPoly", WINDOW_AUTOSIZE );
+       imshow( "trialPoly", frame2 );
+
+
+
+       qDebug() <<"\n" << hullsI.size();
+       qDebug() << "\n" << hullsI[largest_contour_index].size() ;
+       qDebug() << "\npolyHull :" << contours_poly[largest_contour_index].size() ;
+
+
+       //test to put center mark in place
+       Mat center_test;
+       int dilation_size = 1 ;
+       Mat element2 = getStructuringElement( MORPH_ELLIPSE,
+                                            Size( 2*dilation_size + 1, 2*dilation_size+1 ),
+                                            Point( dilation_size, dilation_size ) );
+       // Apply the dilation operation
+       dilate( erosion_dst , center_test , element2 );
+       namedWindow( "center", WINDOW_AUTOSIZE );
+       imshow( "center", center_test );
+
+
+       // get the mass center of a black and white image
+       // another try for mass center
+       Moments m = moments(center_test, false);
+       Point p1(m.m10/m.m00, m.m01/m.m00);
+       Point delta(0,40);
+       Point p;
+       p = p1 - delta ;
+
+       circle(center_test, p, 5, Scalar(128,0,0), -1);
+       circle(cropped, p, 5, Scalar(128,0,0), -1);
+       imshow("center", center_test);
+       imshow("cropped", cropped);
+
+
+    // createTrackbar( "cany_thres:", "canny_image", &lowThreshold, max_lowThreshold, canny_thres );
+    // canny_thres(0,0);
+
+
+
      // resultado melhor com gaussian e thres de aprox 11 e razao 3
+
+     /* begin trackbars
+
 
      createTrackbar( "Element dilation :\n 0: Rect \n 1: Cross \n 2: Ellipse", "canny_image",
                       &dilation_elem, max_elem,
@@ -1952,7 +2285,7 @@ void MainWindow::on_pushButton_clicked()
 
      Erosion (0,0);
 
-
+*/ // enf of track bars
 
 
      //Canny( cropped, cropped_binary, 50, 200, 3 );

@@ -13,6 +13,8 @@
 #include <QtXml>
 #include <QDebug>
 #include <QFileInfo>
+#include <algorithm>
+#include <vector>
 
 #include "squaremarker.h"
 #include "patientfile.h"
