@@ -15,6 +15,7 @@
 #include <QFileInfo>
 #include <algorithm>
 #include <vector>
+#include <cmath>
 
 #include "squaremarker.h"
 #include "patientfile.h"

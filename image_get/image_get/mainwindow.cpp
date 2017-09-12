@@ -123,6 +123,12 @@ void shift_r(int arr[], int n)
   arr[i] = temp;
 }
 
+double distance (int x1 , int x2, int y1 , int y2)
+{
+    return sqrt( (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2) ) ;
+
+}
+
 
 void on_trackbar( int, void* )
 {
@@ -323,6 +329,10 @@ void Erosion (int, void*)
       }
 
       */
+
+
+
+
 
 
 
@@ -2144,6 +2154,11 @@ void MainWindow::on_pushButton_clicked()
      int sizeArray = hullsI[largest_contour_index].size() ;
      int markers_aux_X[sizeArray] = {};
      int markers_aux_Y[sizeArray] = {};
+
+
+     int sizePoly = contours_poly[largest_contour_index].size() ;
+     int poly_X[sizePoly] = {};
+     int poly_Y[sizePoly] = {};
        //Point
      for (int a = 0 ; a < sizeArray ; a ++ )
      {
@@ -2151,11 +2166,13 @@ void MainWindow::on_pushButton_clicked()
          PontoY = hullsI[largest_contour_index][a].y ;
          markers_aux_X[a] = PontoX ;
          markers_aux_Y[a] = PontoY ;
-         qDebug() << "ponto[" << a << "]: " << markers_aux_X[a] << "," << markers_aux_Y[a];
+
+        // qDebug() << "ponto[" << a << "]: " << markers_aux_X[a] << "," << markers_aux_Y[a];
 
          circle( frame2, hullsI[largest_contour_index][a], 4, Scalar(0,0,255), 1, 8, 0 );
 
      }
+
 
      //sort(markers_aux_Y.begin(), markers_aux_Y.end() )
      //ascending_sort(markers_aux_Y, hullsI[largest_contour_index].size());
@@ -2196,17 +2213,131 @@ void MainWindow::on_pushButton_clicked()
      }
 
 
+
+     // gets poly info
+     //fill polly aux array
+       for (int a = 0 ; a < sizePoly ; a ++ )
+       {
+
+           poly_X[a] = contours_poly[largest_contour_index][a].x ;
+           poly_Y[a] = contours_poly[largest_contour_index][a].y ;
+
+           qDebug() << "ponto polly[" << a << "]: " << poly_X[a] << "," << poly_Y[a];
+
+       }
+
+
+       int index_first_poly = 0 ;
+       index_first_poly = findSmallestValue (poly_Y , sizePoly) ;
+       qDebug() << "minimum " << index_first_poly ;
+       int update_index_x_poly = 0 ;
+       update_index_x_poly = getSmallestX (poly_X[index_first_poly-1] , poly_X[index_first_poly] ) ;
+
+       // index of smallest x with y = 0 point
+       index_first_poly = index_first_poly - update_index_x_poly ;
+       qDebug() << ", new minimum : " << update_index_x_poly ;
+
+       int shift_poly = 0 ;
+       //shift = hullsI[largest_contour_index].size() - index_first ;
+       shift_poly = index_first_poly ;
+       qDebug() << "\nshift : " << shift_poly ;
+
+       int x_aux_poly[sizePoly] ;
+       int y_aux_poly[sizePoly] ;
+       for (int i = 0 ; i < sizePoly ; i ++)
+       {
+           x_aux_poly[i] = 0 ;
+           y_aux_poly[i] = 0 ;
+       }
+
+       for (int i = 0 ; i < sizePoly ; i ++)
+       {
+           x_aux_poly[i] = poly_X[i] ;
+           y_aux_poly[i] = poly_Y[i];
+       }
+
+
+      qDebug() << "\n\n\n\n";
+       for ( int i = 0 ; i < shift_poly+1 ; i ++ )
+       {
+           shift_r (x_aux_poly, sizePoly);
+           shift_r (y_aux_poly, sizePoly);
+       }
+
+       for (int a = 0 ; a < sizePoly ; a ++ )
+       {
+
+           qDebug() << "ponto shift polly[" << a << "]: " << x_aux_poly[a] << "," << y_aux_poly[a];
+
+       }
+
+/*
      for (int a = 0 ; a < sizeArray ; a ++ )
      {
          qDebug() << "ponto[" << a << "]: " << x_aux_2[a] << "," << y_aux_2[a];
      }
+     */
 
-    /* for (int a = 0 ; a < hullsI[largest_contour_index].size() ; a ++ )
+
+     // calculate distance between neighboors
+
+     double distanceArray[sizeArray];
+     for (int i = 0 ; i < sizeArray ; i++)
      {
-           qDebug() << "ponto[" << a << "]: " << markers_aux_X[a] << "," << markers_aux_Y[a];
+        distanceArray[i] = distance( x_aux_2[i] , x_aux_2[i+1] , y_aux_2[i], y_aux_2[i+1] ) ;
+        qDebug() << "distancia entre " << i << " e " << i+1 << ":" << distanceArray[i];
      }
 
-     */
+
+     // check if it is right hand or left hand
+     // checa se o segundo ou o penultimo tem o y maior. se for o segundo, mao direita. se for penultimo, mao esquerda
+     int hand = 0 ;
+     if ( poly_Y[1] > poly_Y[sizePoly-2] )
+     {
+         hand = 1 ; // right hand
+         qDebug() << "\n\n\ny1 : " << poly_Y[1] << "y2 : " << poly_Y[sizePoly-2] << "mao esquerda\n\n" ;
+     }
+     else
+     {
+        hand = 0 ;  // left hand
+        qDebug() << "\n\n\ny1 : " << poly_Y[1] << "y2 : " << poly_Y[sizePoly-2] << "mao direita\n\n" ;
+     }
+
+
+
+     // initialize new point array with zero
+     int new_point[sizeArray] ;
+     for (int i = 0 ; i < sizeArray ; i++)
+     {
+        new_point[i] = 0 ;
+     }
+
+     //find new points until 5th point
+
+     // still missing :
+     // if it is right hand (hand = 1 ) , loop upwards towars x_aux_2 e y_aux_2. otherwise, loop downwards
+     int total_points = 0 ;
+     for (int i = 0 ; i < sizeArray ; i++)
+     {
+
+        if ( distanceArray[i] > 21.9 )
+        {
+            if ( total_points < 5 )
+            {
+                total_points++ ;
+                new_point[i+1] = 1 ;
+                circle( frame2, Point(x_aux_2[i+1],y_aux_2[i+1]), 4, Scalar(255,0,0), 1, 8, 0 );
+            }
+        }
+        else
+        {
+            new_point[i+1] = 0 ;
+        }
+       // qDebug() << "distancia entre " << i << " e " << i+1 << ":" << distanceArray[i] << "novo ponto : " << new_point[i] ;
+     }
+
+
+
 
 
 
