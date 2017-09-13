@@ -1957,7 +1957,7 @@ void MainWindow::on_pushButton_clicked()
     // ---------- begin of crop image ----------
 
     // Setup a rectangle to define your region of interest
-    cv::Rect myROI(2, 30, 300, 200);
+    cv::Rect myROI(2, 30, 300, 210);
 
     // Crop the full image to that image contained by the rectangle myROI
     // Note that this doesn't copy the data
@@ -2264,12 +2264,7 @@ void MainWindow::on_pushButton_clicked()
            shift_r (y_aux_poly, sizePoly);
        }
 
-       for (int a = 0 ; a < sizePoly ; a ++ )
-       {
 
-           qDebug() << "ponto shift polly[" << a << "]: " << x_aux_poly[a] << "," << y_aux_poly[a];
-
-       }
 
 /*
      for (int a = 0 ; a < sizeArray ; a ++ )
@@ -2282,6 +2277,7 @@ void MainWindow::on_pushButton_clicked()
      // calculate distance between neighboors
 
      double distanceArray[sizeArray];
+
      for (int i = 0 ; i < sizeArray ; i++)
      {
         distanceArray[i] = distance( x_aux_2[i] , x_aux_2[i+1] , y_aux_2[i], y_aux_2[i+1] ) ;
@@ -2292,15 +2288,15 @@ void MainWindow::on_pushButton_clicked()
      // check if it is right hand or left hand
      // checa se o segundo ou o penultimo tem o y maior. se for o segundo, mao direita. se for penultimo, mao esquerda
      int hand = 0 ;
-     if ( poly_Y[1] > poly_Y[sizePoly-2] )
+     if ( y_aux_poly[1] > y_aux_poly[sizePoly-2] )
      {
-         hand = 1 ; // right hand
-         qDebug() << "\n\n\ny1 : " << poly_Y[1] << "y2 : " << poly_Y[sizePoly-2] << "mao esquerda\n\n" ;
+         hand = 1 ; // left hand
+         qDebug() << "\n\n\ny1 : " << y_aux_poly[1] << "y2 : " << y_aux_poly[sizePoly-2] << "mao esquerda\n\n" ;
      }
      else
      {
-        hand = 0 ;  // left hand
-        qDebug() << "\n\n\ny1 : " << poly_Y[1] << "y2 : " << poly_Y[sizePoly-2] << "mao direita\n\n" ;
+        hand = 0 ;  // right hand
+        qDebug() << "\n\n\ny1 : " << y_aux_poly[1] << "y2 : " << y_aux_poly[sizePoly-2] << "mao direita\n\n" ;
      }
 
 
@@ -2317,23 +2313,65 @@ void MainWindow::on_pushButton_clicked()
      // still missing :
      // if it is right hand (hand = 1 ) , loop upwards towars x_aux_2 e y_aux_2. otherwise, loop downwards
      int total_points = 0 ;
-     for (int i = 0 ; i < sizeArray ; i++)
+     qDebug() << "total points : " << total_points;
+
+     // right hand
+     if (hand == 0 )
+     {
+         for (int i = 0 ; i < sizeArray ; i++)
+         {
+
+            if ( distanceArray[i] > 20 )
+            {
+                if ( total_points < 5 )
+                {
+                    total_points++ ;
+                    new_point[i+1] = 1 ;
+                    circle( frame2, Point(x_aux_2[i+1],y_aux_2[i+1]), 4, Scalar(255,0,0), 1, 8, 0 );
+                    qDebug() << "total points : " << total_points;
+                }
+            }
+            else
+            {
+                new_point[i+1] = 0 ;
+            }
+         }
+         qDebug() << "mao direita" ;
+         qDebug() << "total points : " << total_points;
+
+     }
+         // left hand
+     else
+     {
+        for (int i = sizeArray-1 ; i > 0 ; i--)
+         {
+            if ( distanceArray[i-1] > 20 )
+            {
+               if ( total_points < 5 )
+               {
+                  total_points++ ;
+                  new_point[i-1] = 1 ;
+                  circle( frame2, Point(x_aux_2[i-1],y_aux_2[i-1]), 4, Scalar(0,255,0), 1, 8, 0 );
+                  qDebug() << "total points : " << total_points;
+               }
+            }
+            else
+            {
+                new_point[i-1] = 0 ;
+            }
+          }
+        qDebug() << "mao esquerda" ;
+        qDebug() << "total points : " << total_points;
+
+
+       // qDebug() << "distancia entre " << i << " e " << i+1 << ":" << distanceArray[i] << "novo ponto : " << new_point[i] ;
+     }
+
+     for (int a = 0 ; a < sizeArray ; a ++ )
      {
 
-        if ( distanceArray[i] > 21.9 )
-        {
-            if ( total_points < 5 )
-            {
-                total_points++ ;
-                new_point[i+1] = 1 ;
-                circle( frame2, Point(x_aux_2[i+1],y_aux_2[i+1]), 4, Scalar(255,0,0), 1, 8, 0 );
-            }
-        }
-        else
-        {
-            new_point[i+1] = 0 ;
-        }
-       // qDebug() << "distancia entre " << i << " e " << i+1 << ":" << distanceArray[i] << "novo ponto : " << new_point[i] ;
+         qDebug() << "ponto [" << a << "]: " << x_aux_2[a] << "," << y_aux_2[a] <<" novo ponto :"  << new_point[a];
+
      }
 
 
