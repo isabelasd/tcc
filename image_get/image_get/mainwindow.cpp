@@ -2385,7 +2385,7 @@ void MainWindow::on_pushButton_clicked()
      {
          if(new_point[a] == 1)
          {
-             if (hand == 0)
+             if (hand == 0) // if left hand,
              {
 
                  x_fingers[finger_index_left] = x_aux_2[a] ;
@@ -2393,7 +2393,7 @@ void MainWindow::on_pushButton_clicked()
                  qDebug() << "marcadores [" << finger_index_left << "]: " << x_fingers[finger_index_left] << "," << y_fingers[finger_index_left] ;
                  finger_index_left = finger_index_left + 1 ;
              }
-             else
+             else // if right hand
              {
                  x_fingers[finger_index_right] = x_aux_2[a] ;
                  y_fingers[finger_index_right] = y_aux_2[a] ;
@@ -2451,24 +2451,60 @@ void MainWindow::on_pushButton_clicked()
        imshow("cropped", cropped);
 
 
+       int Xdelta_repositioning[6] ;
+       int Ydelta_repositioning[6] ;
+
+       if (hand == 1 ) // right hand
+       {
+           Xdelta_repositioning[0] = 0 ;   // centro
+           Xdelta_repositioning[1] = 15 ;  // dedao
+           Xdelta_repositioning[2] = 0 ;   // indicador
+           Xdelta_repositioning[3] = 0 ;   // medio
+           Xdelta_repositioning[4] = 0 ;   // anelar
+           Xdelta_repositioning[5] = -5 ;  // mindinho
+
+           Ydelta_repositioning[0] = 0 ;   // centro
+           Ydelta_repositioning[1] = -10 ;  // dedao
+           Ydelta_repositioning[2] = -20 ; // indicador
+           Ydelta_repositioning[3] = -20 ; // medio
+           Ydelta_repositioning[4] = -20 ; // anelar
+           Ydelta_repositioning[5] = 0 ;   // mindinho
+       }
+       else // left hand
+       {
+           Xdelta_repositioning[0] = 0 ;   // centro
+           Xdelta_repositioning[1] = -15 ; // dedao
+           Xdelta_repositioning[2] = 0 ;   // indicador
+           Xdelta_repositioning[3] = 0 ;   // medio
+           Xdelta_repositioning[4] = 0 ;   // anelar
+           Xdelta_repositioning[5] = 5 ;   // mindinho
+
+           Ydelta_repositioning[0] = 0 ; //centro
+           Ydelta_repositioning[1] = -10 ; //dedao
+           Ydelta_repositioning[2] = -20 ; // indicador
+           Ydelta_repositioning[3] = -20 ; // medio
+           Ydelta_repositioning[4] = -20 ; // anelar
+           Ydelta_repositioning[5] = 0 ; // mindinho
+       }
+
        // update markers position array for repositioning
        // mark 2 = thumb
        // mark 6 = little finger
-       x_markers[image_number*6]   = p.x - ceil(wc/2);
-       x_markers[image_number*6+1] = x_fingers[4] - ceil(wf/2) ;
-       x_markers[image_number*6+2] = x_fingers[3] - ceil(wf/2) ;
-       x_markers[image_number*6+3] = x_fingers[2] - ceil(wf/2) ;
-       x_markers[image_number*6+4] = x_fingers[1]  - ceil(wf/2) ;
-       x_markers[image_number*6+5] = x_fingers[0]  - ceil(wf/2) ;
+       x_markers[image_number*6]   = p.x - ceil(wc/2) + Xdelta_repositioning[0] ;
+       x_markers[image_number*6+1] = x_fingers[4] - ceil(wf/2) + Xdelta_repositioning[1] ;
+       x_markers[image_number*6+2] = x_fingers[3] - ceil(wf/2) + Xdelta_repositioning[2] ;
+       x_markers[image_number*6+3] = x_fingers[2] - ceil(wf/2) + Xdelta_repositioning[3] ;
+       x_markers[image_number*6+4] = x_fingers[1] - ceil(wf/2) + Xdelta_repositioning[4] ;
+       x_markers[image_number*6+5] = x_fingers[0] - ceil(wf/2) + Xdelta_repositioning[5] ;
 
        // adjust y axis after crop -> crop is 30 on y axis.
        // adjust also the size of the marker to draw exactly on the center
-       y_markers[image_number*6]   = p.y + 30 - ceil(wc/2) ;
-       y_markers[image_number*6+1] = y_fingers[4] + 30 - ceil(wf/2) ;
-       y_markers[image_number*6+2] = y_fingers[3] + 30 - ceil(wf/2) ;
-       y_markers[image_number*6+3] = y_fingers[2] + 30 - ceil(wf/2) ;
-       y_markers[image_number*6+4] = y_fingers[1] + 30 - ceil(wf/2) ;
-       y_markers[image_number*6+5] = y_fingers[0] + 30 - ceil(wf/2) ;
+       y_markers[image_number*6]   = p.y + 30 - ceil(wc/2) + Ydelta_repositioning[0] ;
+       y_markers[image_number*6+1] = y_fingers[4] + 30 - ceil(wf/2) + Ydelta_repositioning[1] ;
+       y_markers[image_number*6+2] = y_fingers[3] + 30 - ceil(wf/2) + Ydelta_repositioning[2] ;
+       y_markers[image_number*6+3] = y_fingers[2] + 30 - ceil(wf/2) + Ydelta_repositioning[3] ;
+       y_markers[image_number*6+4] = y_fingers[1] + 30 - ceil(wf/2) + Ydelta_repositioning[4] ;
+       y_markers[image_number*6+5] = y_fingers[0] + 30 - ceil(wf/2) + Ydelta_repositioning[5] ;
 
        size_bigger[image_number*6]   = wc;
        size_bigger[image_number*6+1] = wc;
@@ -2487,10 +2523,10 @@ void MainWindow::on_pushButton_clicked()
 
        // redraw marker . this is important, otherwise doesnt work.
 
-       mark1->setX(x_markers[image_number*6]) ;
-       mark1->setY(y_markers[image_number*6]) ;
-       mark1->w_m = wc  ;
-       mark1->h_m = hc ;
+      mark1->setX(x_markers[image_number*6]) ;
+      mark1->setY(y_markers[image_number*6]) ;
+      mark1->w_m = wc  ;
+      mark1->h_m = hc ;
       scene->removeItem(mark1);
       scene->addItem(mark1);
       mark1->setToolTip("marcador central");
