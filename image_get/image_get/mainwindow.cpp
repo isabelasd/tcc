@@ -1957,7 +1957,7 @@ void MainWindow::on_pushButton_clicked()
     // ---------- begin of crop image ----------
 
     // Setup a rectangle to define your region of interest
-    cv::Rect myROI(2, 30, 300, 210);
+    cv::Rect myROI(0, 30, 320, 210);
 
     // Crop the full image to that image contained by the rectangle myROI
     // Note that this doesn't copy the data
@@ -2367,6 +2367,7 @@ void MainWindow::on_pushButton_clicked()
        // qDebug() << "distancia entre " << i << " e " << i+1 << ":" << distanceArray[i] << "novo ponto : " << new_point[i] ;
      }
 
+
      for (int a = 0 ; a < sizeArray ; a ++ )
      {
 
@@ -2374,8 +2375,33 @@ void MainWindow::on_pushButton_clicked()
 
      }
 
+     //save fingers markers axis
+     int x_fingers[5] ;
+     int y_fingers[5] ;
 
+     int finger_index_left = 0 ;
+     int finger_index_right = 4 ;
+     for (int a = 0 ; a < sizeArray ; a ++ )
+     {
+         if(new_point[a] == 1)
+         {
+             if (hand == 0)
+             {
 
+                 x_fingers[finger_index_left] = x_aux_2[a] ;
+                 y_fingers[finger_index_left] = y_aux_2[a] ;
+                 qDebug() << "marcadores [" << finger_index_left << "]: " << x_fingers[finger_index_left] << "," << y_fingers[finger_index_left] ;
+                 finger_index_left = finger_index_left + 1 ;
+             }
+             else
+             {
+                 x_fingers[finger_index_right] = x_aux_2[a] ;
+                 y_fingers[finger_index_right] = y_aux_2[a] ;
+                 qDebug() << "marcadores [" << finger_index_right << "]: " << x_fingers[finger_index_right] << "," << y_fingers[finger_index_right] ;
+                 finger_index_right = finger_index_right - 1 ;
+             }
+         }
+     }
 
 
 
@@ -2396,6 +2422,7 @@ void MainWindow::on_pushButton_clicked()
        qDebug() <<"\n" << hullsI.size();
        qDebug() << "\n" << hullsI[largest_contour_index].size() ;
        qDebug() << "\npolyHull :" << contours_poly[largest_contour_index].size() ;
+
 
 
        //test to put center mark in place
@@ -2422,6 +2449,94 @@ void MainWindow::on_pushButton_clicked()
        circle(cropped, p, 5, Scalar(128,0,0), -1);
        imshow("center", center_test);
        imshow("cropped", cropped);
+
+
+       // update markers position array for repositioning
+       // mark 2 = thumb
+       // mark 6 = little finger
+       x_markers[image_number*6]   = p.x - ceil(wc/2);
+       x_markers[image_number*6+1] = x_fingers[4] - ceil(wf/2) ;
+       x_markers[image_number*6+2] = x_fingers[3] - ceil(wf/2) ;
+       x_markers[image_number*6+3] = x_fingers[2] - ceil(wf/2) ;
+       x_markers[image_number*6+4] = x_fingers[1]  - ceil(wf/2) ;
+       x_markers[image_number*6+5] = x_fingers[0]  - ceil(wf/2) ;
+
+       // adjust y axis after crop -> crop is 30 on y axis.
+       // adjust also the size of the marker to draw exactly on the center
+       y_markers[image_number*6]   = p.y + 30 - ceil(wc/2) ;
+       y_markers[image_number*6+1] = y_fingers[4] + 30 - ceil(wf/2) ;
+       y_markers[image_number*6+2] = y_fingers[3] + 30 - ceil(wf/2) ;
+       y_markers[image_number*6+3] = y_fingers[2] + 30 - ceil(wf/2) ;
+       y_markers[image_number*6+4] = y_fingers[1] + 30 - ceil(wf/2) ;
+       y_markers[image_number*6+5] = y_fingers[0] + 30 - ceil(wf/2) ;
+
+       size_bigger[image_number*6]   = wc;
+       size_bigger[image_number*6+1] = wc;
+       size_bigger[image_number*6+2] = wc;
+       size_bigger[image_number*6+3] = wc;
+       size_bigger[image_number*6+4] = wc;
+       size_bigger[image_number*6+5] = wc;
+
+       size_smaller[image_number*6]   = wf;
+       size_smaller[image_number*6+1] = wf;
+       size_smaller[image_number*6+2] = wf;
+       size_smaller[image_number*6+3] = wf;
+       size_smaller[image_number*6+4] = wf;
+       size_smaller[image_number*6+5] = wf;
+
+
+       // redraw marker . this is important, otherwise doesnt work.
+
+       mark1->setX(x_markers[image_number*6]) ;
+       mark1->setY(y_markers[image_number*6]) ;
+       mark1->w_m = wc  ;
+       mark1->h_m = hc ;
+      scene->removeItem(mark1);
+      scene->addItem(mark1);
+      mark1->setToolTip("marcador central");
+
+
+      mark2->setX(x_markers[image_number*6+1]) ;
+      mark2->setY(y_markers[image_number*6+1]) ;
+      mark2->w_m = wf ;
+      mark2->h_m = hf ;
+      scene->removeItem(mark2);
+      scene->addItem(mark2);
+
+      mark3->setX(x_markers[image_number*6+2]) ;
+      mark3->setY(y_markers[image_number*6+2]) ;
+      mark3->w_m = wf ;
+      mark3->h_m = hf ;
+      scene->removeItem(mark3);
+      scene->addItem(mark3);
+
+      mark4->setX(x_markers[image_number*6+3]) ;
+      mark4->setY(y_markers[image_number*6+3]) ;
+      mark4->w_m = wf ;
+      mark4->h_m = hf ;
+      scene->removeItem(mark4);
+      scene->addItem(mark4);
+
+      mark5->setX(x_markers[image_number*6+4]) ;
+      mark5->setY(y_markers[image_number*6+4]) ;
+      mark5->w_m = wf ;
+      mark5->h_m = hf ;
+      scene->removeItem(mark5);
+      scene->addItem(mark5);
+
+      mark6->setX(x_markers[image_number*6+5]) ;
+      mark6->setY(y_markers[image_number*6+5]) ;
+      mark6->w_m = wf ;
+      mark6->h_m = hf ;
+      scene->removeItem(mark6);
+      scene->addItem(mark6);
+
+      mark2->setToolTip("marcador dedo polegar");
+      mark3->setToolTip("marcador dedo indicador");
+      mark4->setToolTip("marcador dedo medio");
+      mark5->setToolTip("marcador dedo anelar");
+      mark6->setToolTip("marcador dedo minimo");
+
 
 
     // createTrackbar( "cany_thres:", "canny_image", &lowThreshold, max_lowThreshold, canny_thres );

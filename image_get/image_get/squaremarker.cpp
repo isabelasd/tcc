@@ -14,7 +14,7 @@ QRectF squaremarker::boundingRect() const
 void squaremarker::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     QRectF rect = boundingRect();
-    QPen blackpen(Qt::black);
+    QPen blackpen(Qt::white);
     painter->setPen(blackpen);
     painter->drawRect(rect);
 }
