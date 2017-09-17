@@ -248,11 +248,6 @@
     </property>
     <item>
      <property name="text">
-      <string>manual</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
       <string>metodo1</string>
      </property>
     </item>

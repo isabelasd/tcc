@@ -24,6 +24,8 @@ int const max_kernel_size = 21;
 
 bool warm_hand = false;
 
+int position_method ;
+
 
 
 
@@ -1000,6 +1002,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui -> actionSalvar->setEnabled(false);
 
+    ui->processingMethod->setEnabled(false);
+
     ui->photo_index->setText("Nenhuma foto valida selecionada");
 
 
@@ -1052,6 +1056,8 @@ void MainWindow::on_diretorio_clicked()
             ui->save->setEnabled(false);
 
             ui -> actionSalvar->setEnabled(false);
+
+            ui->processingMethod->setEnabled(false);
 
             ui->spinBox->setEnabled(false);
             ui->spinBox_2->setEnabled(false);
@@ -1177,6 +1183,8 @@ void MainWindow::on_diretorio_clicked()
 
             ui -> actionSalvar -> setEnabled(true);
 
+            ui->processingMethod->setEnabled(true);
+
             ui -> spinBox -> setEnabled(true);
             ui -> spinBox -> setValue(size_bigger[6 * image_number]) ;
             ui -> spinBox_2 ->setEnabled(true);
@@ -1212,6 +1220,8 @@ void MainWindow::on_diretorio_clicked()
         ui->save->setEnabled(false);
 
         ui -> actionSalvar->setEnabled(false);
+
+        ui->processingMethod->setEnabled(false);
 
         ui->spinBox->setEnabled(false);
         ui->spinBox_2->setEnabled(false);
@@ -1927,9 +1937,18 @@ void MainWindow::on_editarFicha_clicked()
 // choose markers location method
 void MainWindow::on_processingMethod_currentIndexChanged(const QString &arg1)
 {
-    if(arg1 == "manual") qDebug() << "\n Metodo: " << arg1 ;
-    if(arg1 == "metodo1") qDebug() << "\n Metodo: " << arg1 ;
-    if(arg1 == "metodo2") qDebug() << "\n Metodo: " << arg1 ;
+    if(arg1 == "metodo1")
+    {
+        position_method = 1 ;
+        qDebug() << "\n Metodo: " << arg1 ;
+        on_pushButton_clicked();
+    }
+
+    if(arg1 == "metodo2")
+    {
+        position_method = 2 ;
+        qDebug() << "\n Metodo: " << arg1 ;
+    }
 }
 
 
@@ -1953,820 +1972,827 @@ void MainWindow::on_pushButton_clicked()
     // --------- end of reading image from path ---------
 
 
-
+    // BEGIN OF METHOD 1
     // ---------- begin of crop image ----------
+    if (position_method == 1 )
+    {
+        // Setup a rectangle to define your region of interest
+        cv::Rect myROI(0, 30, 320, 210);
 
-    // Setup a rectangle to define your region of interest
-    cv::Rect myROI(0, 30, 320, 210);
+        // Crop the full image to that image contained by the rectangle myROI
+        // Note that this doesn't copy the data
+        cv::Mat croppedRef(image, myROI);
 
-    // Crop the full image to that image contained by the rectangle myROI
-    // Note that this doesn't copy the data
-    cv::Mat croppedRef(image, myROI);
 
+        // Copy the data into new matrix
+        croppedRef.copyTo(cropped);
+        namedWindow( "cropped", WINDOW_AUTOSIZE );
+        imshow( "cropped", cropped );
 
-    // Copy the data into new matrix
-    croppedRef.copyTo(cropped);
-    namedWindow( "cropped", WINDOW_AUTOSIZE );
-    imshow( "cropped", cropped );
+        // ---------- end of crop image ----------
+    /*
+        // get BGR mean value inside a rectangle
 
-    // ---------- end of crop image ----------
-/*
-    // get BGR mean value inside a rectangle
+        rectangle(cropped,Point(3,3), Point(10,190), Scalar(0,0,0), 1);
 
-    rectangle(cropped,Point(3,3), Point(10,190), Scalar(0,0,0), 1);
 
+        int intensitymean[3] = {};
+        int intensity_test[3];
+        intensity_test[0] = 0 ; // B
+        intensity_test[1] = 0 ; // G
+        intensity_test[2] = 0 ; // R
 
-    int intensitymean[3] = {};
-    int intensity_test[3];
-    intensity_test[0] = 0 ; // B
-    intensity_test[1] = 0 ; // G
-    intensity_test[2] = 0 ; // R
+        getIntensityBGR(cropped, 3,3,10,190, intensity_test);
+        intensitymean[0] = intensity_test[0];
+        intensitymean[1] = intensity_test[1];
+        intensitymean[2] = intensity_test[2];
 
-    getIntensityBGR(cropped, 3,3,10,190, intensity_test);
-    intensitymean[0] = intensity_test[0];
-    intensitymean[1] = intensity_test[1];
-    intensitymean[2] = intensity_test[2];
+        qDebug() << " b: " << QString::number(intensitymean[0]) << " g: " << QString::number(intensitymean[1]) << " r: " << QString::number(intensitymean[2]) ;
 
-    qDebug() << " b: " << QString::number(intensitymean[0]) << " g: " << QString::number(intensitymean[1]) << " r: " << QString::number(intensitymean[2]) ;
 
+        removeBackground(cropped, intensitymean);
 
-    removeBackground(cropped, intensitymean);
+        Mat cropped_gray(cropped.size(),CV_8UC1);
 
-    Mat cropped_gray(cropped.size(),CV_8UC1);
+        cvtColor( cropped, cropped_gray, CV_BGR2GRAY );
 
-    cvtColor( cropped, cropped_gray, CV_BGR2GRAY );
+        threshold( cropped_gray, cropped, 127, 255,0 );
 
-    threshold( cropped_gray, cropped, 127, 255,0 );
 
 
+      // bitwise_not(cropped,cropped);
+        imshow( "cropped", cropped );
 
-  // bitwise_not(cropped,cropped);
-    imshow( "cropped", cropped );
+        //threshold( src_gray, dst, threshold_value, max_BINARY_value,threshold_type );
 
-    //threshold( src_gray, dst, threshold_value, max_BINARY_value,threshold_type );
+        // contours
+        vector<vector<Point> > contours;
+        vector<Vec4i> hierarchy;
+        RNG rng(12345);
+        findContours( cropped, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0) );
 
-    // contours
-    vector<vector<Point> > contours;
-    vector<Vec4i> hierarchy;
-    RNG rng(12345);
-    findContours( cropped, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0) );
 
+        // convex hull
 
-    // convex hull
-
-    // Find the convex hull object for each contour
-       vector<vector<Point> >hull( contours.size() );
-       for( int i = 0; i < contours.size(); i++ )
-       {
-           convexHull( Mat(contours[i]), hull[i], false );
-       }
-
-
-
-
-    Mat drawing = Mat::zeros( cropped.size(), CV_8UC3 );
-       for( int i = 0; i< contours.size(); i++ )
-          {
-            Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-            drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
-            drawContours( drawing, hull, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
-          }
-
-       /// Show in a window
-       namedWindow( "Hull demo", WINDOW_AUTOSIZE );
-       imshow( "Hull demo", drawing );
-
-*/
-
-// end of segmentation using mean threashold.
-
-
-
-
-    // another try using canny
-
-     namedWindow( "canny_image", WINDOW_AUTOSIZE );
-     Mat cropped_binary(cropped.size(), CV_8UC1);
-
-     // detect if image is warm or not
-     int get_colors[3] ;
-     get_colors[0] = 0 ; // B
-     get_colors[1] = 0 ; // G
-     get_colors[2] = 0 ; // R
-     getIntensityBGR(cropped, 0 , 0 , cropped.size().width , cropped.size().height , get_colors);
-     if (get_colors[2]  > 35 )
-     {
-         warm_hand = true;
-         //lowThreshold = 45;
-         qDebug() << "imagem quente , R: " << QString::number(get_colors[2]);
-     }
-     else
-     {
-         warm_hand = false ;
-         qDebug() << "imagem fria , R : " << QString::number(get_colors[2]) ;
-     }
-
-    // detected_edges = cropped ;
-
-     if (warm_hand)
-     {
-         lowThreshold = 45 ;
-     }
-     else
-     {
-         lowThreshold = 11 ;
-     }
-
-     // begin of image processing
-
-     // blur and canny
-     GaussianBlur( cropped, cropped_blur, Size(3,3) , 1, 1 );
-     //blur( cropped, cropped_blur, Size(3,3) );
-     Canny( cropped_blur, cropped_new, lowThreshold, lowThreshold*razao, kernel_size );
-     imshow( "canny_image", cropped_new );
-
-
-     Mat element_dilation = getStructuringElement( MORPH_ELLIPSE,
-                          Size( 2*dilation_size + 1, 2*dilation_size+1 ),
-                          Point( dilation_size, dilation_size ) );
-
-     // dilation
-     dilate( cropped_new, dilated, element_dilation );
-     imshow( "canny_image", dilated );
-
-     Mat element_erosion = getStructuringElement( MORPH_ELLIPSE,
-                          Size( 2*erosion_size + 1, 2*erosion_size+1 ),
-                          Point( erosion_size, erosion_size ) );
-
-     // Apply the erosion operation
-     erode( dilated, erosion_dst, element_erosion );
-     imshow( "canny_image", erosion_dst );
-
-     // contours
-     vector<vector<Point> > contours;
-     vector<Vec4i> hierarchy;
-     RNG rng(12345);
-     findContours( erosion_dst, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0) );
-
-     // begin of test to get contours
-
-     vector<vector<Point>> hull( contours.size() );
-     vector<vector<Point>> hullsI( contours.size() );
-     vector<vector<Point>> contours_poly( contours.size() );
-     vector<vector<Vec4i>> defects( contours.size()) ;
-     Point2f rect_points[4];
-     vector<RotatedRect> minRect( contours.size() );
-     vector<Rect> boundRect( contours.size() );
-
-     Mat frame2 = Mat::zeros( erosion_dst.size(), CV_8UC3 );
-     int largest_contour_index;
-     largest_contour_index = findBiggestContour(contours);
-
-     for( int i = 0; i < contours.size(); i++ )
-          {
-              convexHull( Mat(contours[i]), hull[i], false );
-              convexHull( Mat(contours[i]), hullsI[i], true );
-              //convexityDefects(Mat(contours[i]),hullsI[i], defects[i]);
-
-                 if(largest_contour_index == i)
-                    {
-                      // minRect[i] = minAreaRect( Mat(contours[i]) );
-
-                      //draw contour of biggest object
-                       drawContours( frame2, contours,largest_contour_index, CV_RGB(255,255,255), 1, 8, vector<Vec4i>(),0, Point() );
-                     //draw hull of biggesr object
-                       drawContours( frame2, hull, largest_contour_index, CV_RGB(255,255,0), 1, 8, vector<Vec4i>(), 0, Point() );
-
-
-                       approxPolyDP( Mat(hull[i]), contours_poly[i], 2, true );
-                       boundRect[i] = boundingRect( Mat(contours_poly[i]) );
-                       rectangle( frame2, boundRect[i].tl(), boundRect[i].br(), CV_RGB(0,255,0), 1, 8, 0 );
-
-
-
-
-                    }
-          }
-
-
-     int PontoX = 0 ;
-     int PontoY = 0 ;
-     int sizeArray = hullsI[largest_contour_index].size() ;
-     int markers_aux_X[sizeArray] = {};
-     int markers_aux_Y[sizeArray] = {};
-
-
-     int sizePoly = contours_poly[largest_contour_index].size() ;
-     int poly_X[sizePoly] = {};
-     int poly_Y[sizePoly] = {};
-       //Point
-     for (int a = 0 ; a < sizeArray ; a ++ )
-     {
-         PontoX = hullsI[largest_contour_index][a].x ;
-         PontoY = hullsI[largest_contour_index][a].y ;
-         markers_aux_X[a] = PontoX ;
-         markers_aux_Y[a] = PontoY ;
-
-        // qDebug() << "ponto[" << a << "]: " << markers_aux_X[a] << "," << markers_aux_Y[a];
-
-         circle( frame2, hullsI[largest_contour_index][a], 4, Scalar(0,0,255), 1, 8, 0 );
-
-     }
-
-
-     //sort(markers_aux_Y.begin(), markers_aux_Y.end() )
-     //ascending_sort(markers_aux_Y, hullsI[largest_contour_index].size());
-     int index_first = 0 ;
-     index_first = findSmallestValue (markers_aux_Y , sizeArray) ;
-     qDebug() << "minimum " << index_first ;
-     int update_index_x = 0 ;
-     update_index_x = getSmallestX (markers_aux_X[index_first-1] , markers_aux_X[index_first] ) ;
-
-     // index of smallest x with y = 0 point
-     index_first = index_first - update_index_x ;
-     qDebug() << ", new minimum : " << index_first ;
-
-     int shift = 0 ;
-     //shift = hullsI[largest_contour_index].size() - index_first ;
-     shift = index_first ;
-     qDebug() << "\nshift : " << shift ;
-
-     int x_aux_2[sizeArray] ;
-     int y_aux_2[sizeArray] ;
-     for (int i = 0 ; i < sizeArray ; i ++)
-     {
-         x_aux_2[i] = 0 ;
-         y_aux_2[i] = 0 ;
-     }
-
-     for (int i = 0 ; i < sizeArray ; i ++)
-     {
-         x_aux_2[i] = markers_aux_X[i] ;
-         y_aux_2[i] = markers_aux_Y[i];
-     }
-
-    qDebug() << "\n\n\n\n";
-     for ( int i = 0 ; i < shift ; i ++ )
-     {
-         shift_r (x_aux_2, sizeArray);
-         shift_r (y_aux_2, sizeArray);
-     }
-
-
-
-     // gets poly info
-     //fill polly aux array
-       for (int a = 0 ; a < sizePoly ; a ++ )
-       {
-
-           poly_X[a] = contours_poly[largest_contour_index][a].x ;
-           poly_Y[a] = contours_poly[largest_contour_index][a].y ;
-
-           qDebug() << "ponto polly[" << a << "]: " << poly_X[a] << "," << poly_Y[a];
-
-       }
-
-
-       int index_first_poly = 0 ;
-       index_first_poly = findSmallestValue (poly_Y , sizePoly) ;
-       qDebug() << "minimum " << index_first_poly ;
-       int update_index_x_poly = 0 ;
-       update_index_x_poly = getSmallestX (poly_X[index_first_poly-1] , poly_X[index_first_poly] ) ;
-
-       // index of smallest x with y = 0 point
-       index_first_poly = index_first_poly - update_index_x_poly ;
-       qDebug() << ", new minimum : " << update_index_x_poly ;
-
-       int shift_poly = 0 ;
-       //shift = hullsI[largest_contour_index].size() - index_first ;
-       shift_poly = index_first_poly ;
-       qDebug() << "\nshift : " << shift_poly ;
-
-       int x_aux_poly[sizePoly] ;
-       int y_aux_poly[sizePoly] ;
-       for (int i = 0 ; i < sizePoly ; i ++)
-       {
-           x_aux_poly[i] = 0 ;
-           y_aux_poly[i] = 0 ;
-       }
-
-       for (int i = 0 ; i < sizePoly ; i ++)
-       {
-           x_aux_poly[i] = poly_X[i] ;
-           y_aux_poly[i] = poly_Y[i];
-       }
-
-
-      qDebug() << "\n\n\n\n";
-       for ( int i = 0 ; i < shift_poly+1 ; i ++ )
-       {
-           shift_r (x_aux_poly, sizePoly);
-           shift_r (y_aux_poly, sizePoly);
-       }
-
-
-
-/*
-     for (int a = 0 ; a < sizeArray ; a ++ )
-     {
-         qDebug() << "ponto[" << a << "]: " << x_aux_2[a] << "," << y_aux_2[a];
-     }
-     */
-
-
-     // calculate distance between neighboors
-
-     double distanceArray[sizeArray];
-
-     for (int i = 0 ; i < sizeArray ; i++)
-     {
-        distanceArray[i] = distance( x_aux_2[i] , x_aux_2[i+1] , y_aux_2[i], y_aux_2[i+1] ) ;
-        qDebug() << "distancia entre " << i << " e " << i+1 << ":" << distanceArray[i];
-     }
-
-
-     // check if it is right hand or left hand
-     // checa se o segundo ou o penultimo tem o y maior. se for o segundo, mao direita. se for penultimo, mao esquerda
-     int hand = 0 ;
-     if ( y_aux_poly[1] > y_aux_poly[sizePoly-2] )
-     {
-         hand = 1 ; // left hand
-         qDebug() << "\n\n\ny1 : " << y_aux_poly[1] << "y2 : " << y_aux_poly[sizePoly-2] << "mao esquerda\n\n" ;
-     }
-     else
-     {
-        hand = 0 ;  // right hand
-        qDebug() << "\n\n\ny1 : " << y_aux_poly[1] << "y2 : " << y_aux_poly[sizePoly-2] << "mao direita\n\n" ;
-     }
-
-
-
-     // initialize new point array with zero
-     int new_point[sizeArray] ;
-     for (int i = 0 ; i < sizeArray ; i++)
-     {
-        new_point[i] = 0 ;
-     }
-
-     //find new points until 5th point
-
-     // still missing :
-     // if it is right hand (hand = 1 ) , loop upwards towars x_aux_2 e y_aux_2. otherwise, loop downwards
-     int total_points = 0 ;
-     qDebug() << "total points : " << total_points;
-
-     // right hand
-     if (hand == 0 )
-     {
-         for (int i = 0 ; i < sizeArray ; i++)
-         {
-
-            if ( distanceArray[i] > 20 )
-            {
-                if ( total_points < 5 )
-                {
-                    total_points++ ;
-                    new_point[i+1] = 1 ;
-                    circle( frame2, Point(x_aux_2[i+1],y_aux_2[i+1]), 4, Scalar(255,0,0), 1, 8, 0 );
-                    qDebug() << "total points : " << total_points;
-                }
-            }
-            else
-            {
-                new_point[i+1] = 0 ;
-            }
-         }
-         qDebug() << "mao direita" ;
-         qDebug() << "total points : " << total_points;
-
-     }
-         // left hand
-     else
-     {
-        for (int i = sizeArray-1 ; i > 0 ; i--)
-         {
-            if ( distanceArray[i-1] > 20 )
-            {
-               if ( total_points < 5 )
-               {
-                  total_points++ ;
-                  new_point[i-1] = 1 ;
-                  circle( frame2, Point(x_aux_2[i-1],y_aux_2[i-1]), 4, Scalar(0,255,0), 1, 8, 0 );
-                  qDebug() << "total points : " << total_points;
-               }
-            }
-            else
-            {
-                new_point[i-1] = 0 ;
-            }
-          }
-        qDebug() << "mao esquerda" ;
-        qDebug() << "total points : " << total_points;
-
-
-       // qDebug() << "distancia entre " << i << " e " << i+1 << ":" << distanceArray[i] << "novo ponto : " << new_point[i] ;
-     }
-
-
-     for (int a = 0 ; a < sizeArray ; a ++ )
-     {
-
-         qDebug() << "ponto [" << a << "]: " << x_aux_2[a] << "," << y_aux_2[a] <<" novo ponto :"  << new_point[a];
-
-     }
-
-     //save fingers markers axis
-     int x_fingers[5] ;
-     int y_fingers[5] ;
-
-     int finger_index_left = 0 ;
-     int finger_index_right = 4 ;
-     for (int a = 0 ; a < sizeArray ; a ++ )
-     {
-         if(new_point[a] == 1)
-         {
-             if (hand == 0) // if left hand,
-             {
-
-                 x_fingers[finger_index_left] = x_aux_2[a] ;
-                 y_fingers[finger_index_left] = y_aux_2[a] ;
-                 qDebug() << "marcadores [" << finger_index_left << "]: " << x_fingers[finger_index_left] << "," << y_fingers[finger_index_left] ;
-                 finger_index_left = finger_index_left + 1 ;
-             }
-             else // if right hand
-             {
-                 x_fingers[finger_index_right] = x_aux_2[a] ;
-                 y_fingers[finger_index_right] = y_aux_2[a] ;
-                 qDebug() << "marcadores [" << finger_index_right << "]: " << x_fingers[finger_index_right] << "," << y_fingers[finger_index_right] ;
-                 finger_index_right = finger_index_right - 1 ;
-             }
-         }
-     }
-
-
-
-       namedWindow( "trial", WINDOW_AUTOSIZE );
-       imshow( "trial", frame2 );
-
-
-       for (int a = 0 ; a < contours_poly[largest_contour_index].size() ; a ++ )
-       {
-           circle( frame2, contours_poly[largest_contour_index][a], 4, Scalar(0,255,255), 1, 8, 0 );
-       }
-
-       namedWindow( "trialPoly", WINDOW_AUTOSIZE );
-       imshow( "trialPoly", frame2 );
-
-
-
-       qDebug() <<"\n" << hullsI.size();
-       qDebug() << "\n" << hullsI[largest_contour_index].size() ;
-       qDebug() << "\npolyHull :" << contours_poly[largest_contour_index].size() ;
-
-
-
-       //test to put center mark in place
-       Mat center_test;
-       int dilation_size = 1 ;
-       Mat element2 = getStructuringElement( MORPH_ELLIPSE,
-                                            Size( 2*dilation_size + 1, 2*dilation_size+1 ),
-                                            Point( dilation_size, dilation_size ) );
-       // Apply the dilation operation
-       dilate( erosion_dst , center_test , element2 );
-       namedWindow( "center", WINDOW_AUTOSIZE );
-       imshow( "center", center_test );
-
-
-       // get the mass center of a black and white image
-       // another try for mass center
-       Moments m = moments(center_test, false);
-       Point p1(m.m10/m.m00, m.m01/m.m00);
-       Point delta(0,40);
-       Point p;
-       p = p1 - delta ;
-
-       circle(center_test, p, 5, Scalar(128,0,0), -1);
-       circle(cropped, p, 5, Scalar(128,0,0), -1);
-       imshow("center", center_test);
-       imshow("cropped", cropped);
-
-
-       int Xdelta_repositioning[6] ;
-       int Ydelta_repositioning[6] ;
-
-       if (hand == 1 ) // right hand
-       {
-           Xdelta_repositioning[0] = 0 ;   // centro
-           Xdelta_repositioning[1] = 15 ;  // dedao
-           Xdelta_repositioning[2] = 0 ;   // indicador
-           Xdelta_repositioning[3] = 0 ;   // medio
-           Xdelta_repositioning[4] = 0 ;   // anelar
-           Xdelta_repositioning[5] = -5 ;  // mindinho
-
-           Ydelta_repositioning[0] = 0 ;   // centro
-           Ydelta_repositioning[1] = -10 ;  // dedao
-           Ydelta_repositioning[2] = -20 ; // indicador
-           Ydelta_repositioning[3] = -20 ; // medio
-           Ydelta_repositioning[4] = -20 ; // anelar
-           Ydelta_repositioning[5] = 0 ;   // mindinho
-       }
-       else // left hand
-       {
-           Xdelta_repositioning[0] = 0 ;   // centro
-           Xdelta_repositioning[1] = -15 ; // dedao
-           Xdelta_repositioning[2] = 0 ;   // indicador
-           Xdelta_repositioning[3] = 0 ;   // medio
-           Xdelta_repositioning[4] = 0 ;   // anelar
-           Xdelta_repositioning[5] = 5 ;   // mindinho
-
-           Ydelta_repositioning[0] = 0 ; //centro
-           Ydelta_repositioning[1] = -10 ; //dedao
-           Ydelta_repositioning[2] = -20 ; // indicador
-           Ydelta_repositioning[3] = -20 ; // medio
-           Ydelta_repositioning[4] = -20 ; // anelar
-           Ydelta_repositioning[5] = 0 ; // mindinho
-       }
-
-       // update markers position array for repositioning
-       // mark 2 = thumb
-       // mark 6 = little finger
-       x_markers[image_number*6]   = p.x - ceil(wc/2) + Xdelta_repositioning[0] ;
-       x_markers[image_number*6+1] = x_fingers[4] - ceil(wf/2) + Xdelta_repositioning[1] ;
-       x_markers[image_number*6+2] = x_fingers[3] - ceil(wf/2) + Xdelta_repositioning[2] ;
-       x_markers[image_number*6+3] = x_fingers[2] - ceil(wf/2) + Xdelta_repositioning[3] ;
-       x_markers[image_number*6+4] = x_fingers[1] - ceil(wf/2) + Xdelta_repositioning[4] ;
-       x_markers[image_number*6+5] = x_fingers[0] - ceil(wf/2) + Xdelta_repositioning[5] ;
-
-       // adjust y axis after crop -> crop is 30 on y axis.
-       // adjust also the size of the marker to draw exactly on the center
-       y_markers[image_number*6]   = p.y + 30 - ceil(wc/2) + Ydelta_repositioning[0] ;
-       y_markers[image_number*6+1] = y_fingers[4] + 30 - ceil(wf/2) + Ydelta_repositioning[1] ;
-       y_markers[image_number*6+2] = y_fingers[3] + 30 - ceil(wf/2) + Ydelta_repositioning[2] ;
-       y_markers[image_number*6+3] = y_fingers[2] + 30 - ceil(wf/2) + Ydelta_repositioning[3] ;
-       y_markers[image_number*6+4] = y_fingers[1] + 30 - ceil(wf/2) + Ydelta_repositioning[4] ;
-       y_markers[image_number*6+5] = y_fingers[0] + 30 - ceil(wf/2) + Ydelta_repositioning[5] ;
-
-       size_bigger[image_number*6]   = wc;
-       size_bigger[image_number*6+1] = wc;
-       size_bigger[image_number*6+2] = wc;
-       size_bigger[image_number*6+3] = wc;
-       size_bigger[image_number*6+4] = wc;
-       size_bigger[image_number*6+5] = wc;
-
-       size_smaller[image_number*6]   = wf;
-       size_smaller[image_number*6+1] = wf;
-       size_smaller[image_number*6+2] = wf;
-       size_smaller[image_number*6+3] = wf;
-       size_smaller[image_number*6+4] = wf;
-       size_smaller[image_number*6+5] = wf;
-
-
-       // redraw marker . this is important, otherwise doesnt work.
-
-      mark1->setX(x_markers[image_number*6]) ;
-      mark1->setY(y_markers[image_number*6]) ;
-      mark1->w_m = wc  ;
-      mark1->h_m = hc ;
-      scene->removeItem(mark1);
-      scene->addItem(mark1);
-      mark1->setToolTip("marcador central");
-
-
-      mark2->setX(x_markers[image_number*6+1]) ;
-      mark2->setY(y_markers[image_number*6+1]) ;
-      mark2->w_m = wf ;
-      mark2->h_m = hf ;
-      scene->removeItem(mark2);
-      scene->addItem(mark2);
-
-      mark3->setX(x_markers[image_number*6+2]) ;
-      mark3->setY(y_markers[image_number*6+2]) ;
-      mark3->w_m = wf ;
-      mark3->h_m = hf ;
-      scene->removeItem(mark3);
-      scene->addItem(mark3);
-
-      mark4->setX(x_markers[image_number*6+3]) ;
-      mark4->setY(y_markers[image_number*6+3]) ;
-      mark4->w_m = wf ;
-      mark4->h_m = hf ;
-      scene->removeItem(mark4);
-      scene->addItem(mark4);
-
-      mark5->setX(x_markers[image_number*6+4]) ;
-      mark5->setY(y_markers[image_number*6+4]) ;
-      mark5->w_m = wf ;
-      mark5->h_m = hf ;
-      scene->removeItem(mark5);
-      scene->addItem(mark5);
-
-      mark6->setX(x_markers[image_number*6+5]) ;
-      mark6->setY(y_markers[image_number*6+5]) ;
-      mark6->w_m = wf ;
-      mark6->h_m = hf ;
-      scene->removeItem(mark6);
-      scene->addItem(mark6);
-
-      mark2->setToolTip("marcador dedo polegar");
-      mark3->setToolTip("marcador dedo indicador");
-      mark4->setToolTip("marcador dedo medio");
-      mark5->setToolTip("marcador dedo anelar");
-      mark6->setToolTip("marcador dedo minimo");
-
-
-
-    // createTrackbar( "cany_thres:", "canny_image", &lowThreshold, max_lowThreshold, canny_thres );
-    // canny_thres(0,0);
-
-
-
-     // resultado melhor com gaussian e thres de aprox 11 e razao 3
-
-     /* begin trackbars
-
-
-     createTrackbar( "Element dilation :\n 0: Rect \n 1: Cross \n 2: Ellipse", "canny_image",
-                      &dilation_elem, max_elem,
-                      Dilation );
-
-    createTrackbar( "Kernel size dilation:\n 2n +1", "canny_image",
-                      &dilation_size, max_kernel_size,
-                      Dilation );
-    Dilation( 0, 0 );
-
-    /// Create Erosion Trackbar
-     createTrackbar( "Element eroison:\n 0: Rect \n 1: Cross \n 2: Ellipse", "canny_image",
-                 &erosion_elem, max_elem,
-             Erosion );
-
-     createTrackbar( "Kernel size erosion:\n 2n +1", "canny_image",
-             &erosion_size, max_kernel_size,
-             Erosion );
-
-     Erosion (0,0);
-
-*/ // enf of track bars
-
-
-     //Canny( cropped, cropped_binary, 50, 200, 3 );
-
-   //  imshow( "canny_image", cropped_binary );
-/*
-     // contours
-     vector<vector<Point> > contours;
-     vector<Vec4i> hierarchy;
-     RNG rng(12345);
-     findContours( cropped_binary, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0) );
-
-     // Find the convex hull object for each contour
-        vector<vector<Point> >hull( contours.size() );
-        for( int i = 0; i < contours.size(); i++ )
-        {
-            convexHull( Mat(contours[i]), hull[i], false );
-        }
-
-     Mat drawing = Mat::zeros( cropped_binary.size(), CV_8UC3 );
-        for( int i = 0; i< contours.size(); i++ )
+        // Find the convex hull object for each contour
+           vector<vector<Point> >hull( contours.size() );
+           for( int i = 0; i < contours.size(); i++ )
            {
-             Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-             drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
-             drawContours( drawing, hull, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+               convexHull( Mat(contours[i]), hull[i], false );
            }
 
-        /// Show in a window
-        namedWindow( "contours", WINDOW_AUTOSIZE );
-        imshow( "contours", drawing );
-
-*/
 
 
-    // end of another try using canny
 
-     // -----------------------
-    // Gray scale
+        Mat drawing = Mat::zeros( cropped.size(), CV_8UC3 );
+           for( int i = 0; i< contours.size(); i++ )
+              {
+                Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+                drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+                drawContours( drawing, hull, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+              }
+
+           /// Show in a window
+           namedWindow( "Hull demo", WINDOW_AUTOSIZE );
+           imshow( "Hull demo", drawing );
+
+    */
+
+    // end of segmentation using mean threashold.
+
+
+
+
+        // another try using canny
+
+         namedWindow( "canny_image", WINDOW_AUTOSIZE );
+         Mat cropped_binary(cropped.size(), CV_8UC1);
+
+         // detect if image is warm or not
+         int get_colors[3] ;
+         get_colors[0] = 0 ; // B
+         get_colors[1] = 0 ; // G
+         get_colors[2] = 0 ; // R
+         getIntensityBGR(cropped, 0 , 0 , cropped.size().width , cropped.size().height , get_colors);
+         if (get_colors[2]  > 35 )
+         {
+             warm_hand = true;
+             //lowThreshold = 45;
+             qDebug() << "imagem quente , R: " << QString::number(get_colors[2]);
+         }
+         else
+         {
+             warm_hand = false ;
+             qDebug() << "imagem fria , R : " << QString::number(get_colors[2]) ;
+         }
+
+        // detected_edges = cropped ;
+
+         if (warm_hand)
+         {
+             lowThreshold = 45 ;
+         }
+         else
+         {
+             lowThreshold = 11 ;
+         }
+
+         // begin of image processing
+
+         // blur and canny
+         GaussianBlur( cropped, cropped_blur, Size(3,3) , 1, 1 );
+         //blur( cropped, cropped_blur, Size(3,3) );
+         Canny( cropped_blur, cropped_new, lowThreshold, lowThreshold*razao, kernel_size );
+         imshow( "canny_image", cropped_new );
+
+
+         Mat element_dilation = getStructuringElement( MORPH_ELLIPSE,
+                              Size( 2*dilation_size + 1, 2*dilation_size+1 ),
+                              Point( dilation_size, dilation_size ) );
+
+         // dilation
+         dilate( cropped_new, dilated, element_dilation );
+         imshow( "canny_image", dilated );
+
+         Mat element_erosion = getStructuringElement( MORPH_ELLIPSE,
+                              Size( 2*erosion_size + 1, 2*erosion_size+1 ),
+                              Point( erosion_size, erosion_size ) );
+
+         // Apply the erosion operation
+         erode( dilated, erosion_dst, element_erosion );
+         imshow( "canny_image", erosion_dst );
+
+         // contours
+         vector<vector<Point> > contours;
+         vector<Vec4i> hierarchy;
+         RNG rng(12345);
+         findContours( erosion_dst, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+         // begin of test to get contours
+
+         vector<vector<Point>> hull( contours.size() );
+         vector<vector<Point>> hullsI( contours.size() );
+         vector<vector<Point>> contours_poly( contours.size() );
+         vector<vector<Vec4i>> defects( contours.size()) ;
+         Point2f rect_points[4];
+         vector<RotatedRect> minRect( contours.size() );
+         vector<Rect> boundRect( contours.size() );
+
+         Mat frame2 = Mat::zeros( erosion_dst.size(), CV_8UC3 );
+         int largest_contour_index;
+         largest_contour_index = findBiggestContour(contours);
+
+         for( int i = 0; i < contours.size(); i++ )
+              {
+                  convexHull( Mat(contours[i]), hull[i], false );
+                  convexHull( Mat(contours[i]), hullsI[i], true );
+                  //convexityDefects(Mat(contours[i]),hullsI[i], defects[i]);
+
+                     if(largest_contour_index == i)
+                        {
+                          // minRect[i] = minAreaRect( Mat(contours[i]) );
+
+                          //draw contour of biggest object
+                           drawContours( frame2, contours,largest_contour_index, CV_RGB(255,255,255), 1, 8, vector<Vec4i>(),0, Point() );
+                         //draw hull of biggesr object
+                           drawContours( frame2, hull, largest_contour_index, CV_RGB(255,255,0), 1, 8, vector<Vec4i>(), 0, Point() );
+
+
+                           approxPolyDP( Mat(hull[i]), contours_poly[i], 2, true );
+                           boundRect[i] = boundingRect( Mat(contours_poly[i]) );
+                           rectangle( frame2, boundRect[i].tl(), boundRect[i].br(), CV_RGB(0,255,0), 1, 8, 0 );
+
+
+
+
+                        }
+              }
+
+
+         int PontoX = 0 ;
+         int PontoY = 0 ;
+         int sizeArray = hullsI[largest_contour_index].size() ;
+         int markers_aux_X[sizeArray] = {};
+         int markers_aux_Y[sizeArray] = {};
+
+
+         int sizePoly = contours_poly[largest_contour_index].size() ;
+         int poly_X[sizePoly] = {};
+         int poly_Y[sizePoly] = {};
+           //Point
+         for (int a = 0 ; a < sizeArray ; a ++ )
+         {
+             PontoX = hullsI[largest_contour_index][a].x ;
+             PontoY = hullsI[largest_contour_index][a].y ;
+             markers_aux_X[a] = PontoX ;
+             markers_aux_Y[a] = PontoY ;
+
+            // qDebug() << "ponto[" << a << "]: " << markers_aux_X[a] << "," << markers_aux_Y[a];
+
+             circle( frame2, hullsI[largest_contour_index][a], 4, Scalar(0,0,255), 1, 8, 0 );
+
+         }
+
+
+         //sort(markers_aux_Y.begin(), markers_aux_Y.end() )
+         //ascending_sort(markers_aux_Y, hullsI[largest_contour_index].size());
+         int index_first = 0 ;
+         index_first = findSmallestValue (markers_aux_Y , sizeArray) ;
+         qDebug() << "minimum " << index_first ;
+         int update_index_x = 0 ;
+         update_index_x = getSmallestX (markers_aux_X[index_first-1] , markers_aux_X[index_first] ) ;
+
+         // index of smallest x with y = 0 point
+         index_first = index_first - update_index_x ;
+         qDebug() << ", new minimum : " << index_first ;
+
+         int shift = 0 ;
+         //shift = hullsI[largest_contour_index].size() - index_first ;
+         shift = index_first ;
+         qDebug() << "\nshift : " << shift ;
+
+         int x_aux_2[sizeArray] ;
+         int y_aux_2[sizeArray] ;
+         for (int i = 0 ; i < sizeArray ; i ++)
+         {
+             x_aux_2[i] = 0 ;
+             y_aux_2[i] = 0 ;
+         }
+
+         for (int i = 0 ; i < sizeArray ; i ++)
+         {
+             x_aux_2[i] = markers_aux_X[i] ;
+             y_aux_2[i] = markers_aux_Y[i];
+         }
+
+        qDebug() << "\n\n\n\n";
+         for ( int i = 0 ; i < shift ; i ++ )
+         {
+             shift_r (x_aux_2, sizeArray);
+             shift_r (y_aux_2, sizeArray);
+         }
+
+
+
+         // gets poly info
+         //fill polly aux array
+           for (int a = 0 ; a < sizePoly ; a ++ )
+           {
+
+               poly_X[a] = contours_poly[largest_contour_index][a].x ;
+               poly_Y[a] = contours_poly[largest_contour_index][a].y ;
+
+               qDebug() << "ponto polly[" << a << "]: " << poly_X[a] << "," << poly_Y[a];
+
+           }
+
+
+           int index_first_poly = 0 ;
+           index_first_poly = findSmallestValue (poly_Y , sizePoly) ;
+           qDebug() << "minimum " << index_first_poly ;
+           int update_index_x_poly = 0 ;
+           update_index_x_poly = getSmallestX (poly_X[index_first_poly-1] , poly_X[index_first_poly] ) ;
+
+           // index of smallest x with y = 0 point
+           index_first_poly = index_first_poly - update_index_x_poly ;
+           qDebug() << ", new minimum : " << update_index_x_poly ;
+
+           int shift_poly = 0 ;
+           //shift = hullsI[largest_contour_index].size() - index_first ;
+           shift_poly = index_first_poly ;
+           qDebug() << "\nshift : " << shift_poly ;
+
+           int x_aux_poly[sizePoly] ;
+           int y_aux_poly[sizePoly] ;
+           for (int i = 0 ; i < sizePoly ; i ++)
+           {
+               x_aux_poly[i] = 0 ;
+               y_aux_poly[i] = 0 ;
+           }
+
+           for (int i = 0 ; i < sizePoly ; i ++)
+           {
+               x_aux_poly[i] = poly_X[i] ;
+               y_aux_poly[i] = poly_Y[i];
+           }
+
+
+          qDebug() << "\n\n\n\n";
+           for ( int i = 0 ; i < shift_poly+1 ; i ++ )
+           {
+               shift_r (x_aux_poly, sizePoly);
+               shift_r (y_aux_poly, sizePoly);
+           }
+
+
 
     /*
-     *
-    Mat image_gray(image.size(),CV_8UC1);
-    //Mat binary_image ;
-
-    cvtColor( image, image_gray, CV_BGR2GRAY );
-
-    Mat cdst ;
+         for (int a = 0 ; a < sizeArray ; a ++ )
+         {
+             qDebug() << "ponto[" << a << "]: " << x_aux_2[a] << "," << y_aux_2[a];
+         }
+         */
 
 
-    namedWindow("window", CV_WINDOW_AUTOSIZE );
+         // calculate distance between neighboors
 
-    //createTrackbar( "Min Threshold:", "window", &lowThreshold, max_lowThreshold, on_trackbar );
+         double distanceArray[sizeArray];
 
-    //Canny( image_gray, binary_image, 50, 50*3, 3 );
-      //createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold, CannyThreshold );
-    //blur( image_gray, binary_image, Size(9,9) );
-
-
-
-    Canny( image, binary_image, 50, 200, 3 );
-    cvtColor(binary_image, cdst, CV_GRAY2BGR);
-    /*
-     * createTrackbar( "Element:\n 0: Rect \n 1: Cross \n 2: Ellipse", "window",
-                      &dilation_elem, max_elem,
-                      Dilation );
-
-    //createTrackbar( "Kernel size:\n 2n +1", "window",
-                      &dilation_size, max_kernel_size,
-                      Dilation );
-    Dilation( 0, 0 );
+         for (int i = 0 ; i < sizeArray ; i++)
+         {
+            distanceArray[i] = distance( x_aux_2[i] , x_aux_2[i+1] , y_aux_2[i], y_aux_2[i+1] ) ;
+            qDebug() << "distancia entre " << i << " e " << i+1 << ":" << distanceArray[i];
+         }
 
 
-    vector<Vec2f> lines;
-    HoughLines(binary_image, lines, 1, CV_PI/180, 30, 0, 0 );
+         // check if it is right hand or left hand
+         // checa se o segundo ou o penultimo tem o y maior. se for o segundo, mao direita. se for penultimo, mao esquerda
+         int hand = 0 ;
+         if ( y_aux_poly[1] > y_aux_poly[sizePoly-2] )
+         {
+             hand = 1 ; // left hand
+             qDebug() << "\n\n\ny1 : " << y_aux_poly[1] << "y2 : " << y_aux_poly[sizePoly-2] << "mao esquerda\n\n" ;
+         }
+         else
+         {
+            hand = 0 ;  // right hand
+            qDebug() << "\n\n\ny1 : " << y_aux_poly[1] << "y2 : " << y_aux_poly[sizePoly-2] << "mao direita\n\n" ;
+         }
 
-    for( size_t i = 0; i < lines.size(); i++ )
-    {
-      float rho = lines[i][0], theta = lines[i][1];
-      Point pt1, pt2;
-      double a = cos(theta), b = sin(theta);
-      double x0 = a*rho, y0 = b*rho;
-      pt1.x = cvRound(x0 + 1000*(-b));
-      pt1.y = cvRound(y0 + 1000*(a));
-      pt2.x = cvRound(x0 - 1000*(-b));
-      pt2.y = cvRound(y0 - 1000*(a));
-      line( cdst, pt1, pt2, Scalar(0,0,255), 1, CV_AA);
+
+
+         // initialize new point array with zero
+         int new_point[sizeArray] ;
+         for (int i = 0 ; i < sizeArray ; i++)
+         {
+            new_point[i] = 0 ;
+         }
+
+         //find new points until 5th point
+
+         // still missing :
+         // if it is right hand (hand = 1 ) , loop upwards towars x_aux_2 e y_aux_2. otherwise, loop downwards
+         int total_points = 0 ;
+         qDebug() << "total points : " << total_points;
+
+         // right hand
+         if (hand == 0 )
+         {
+             for (int i = 0 ; i < sizeArray ; i++)
+             {
+
+                if ( distanceArray[i] > 20 )
+                {
+                    if ( total_points < 5 )
+                    {
+                        total_points++ ;
+                        new_point[i+1] = 1 ;
+                        circle( frame2, Point(x_aux_2[i+1],y_aux_2[i+1]), 4, Scalar(255,0,0), 1, 8, 0 );
+                        qDebug() << "total points : " << total_points;
+                    }
+                }
+                else
+                {
+                    new_point[i+1] = 0 ;
+                }
+             }
+             qDebug() << "mao direita" ;
+             qDebug() << "total points : " << total_points;
+
+         }
+             // left hand
+         else
+         {
+            for (int i = sizeArray-1 ; i > 0 ; i--)
+             {
+                if ( distanceArray[i-1] > 20 )
+                {
+                   if ( total_points < 5 )
+                   {
+                      total_points++ ;
+                      new_point[i-1] = 1 ;
+                      circle( frame2, Point(x_aux_2[i-1],y_aux_2[i-1]), 4, Scalar(0,255,0), 1, 8, 0 );
+                      qDebug() << "total points : " << total_points;
+                   }
+                }
+                else
+                {
+                    new_point[i-1] = 0 ;
+                }
+              }
+            qDebug() << "mao esquerda" ;
+            qDebug() << "total points : " << total_points;
+
+
+           // qDebug() << "distancia entre " << i << " e " << i+1 << ":" << distanceArray[i] << "novo ponto : " << new_point[i] ;
+         }
+
+
+         for (int a = 0 ; a < sizeArray ; a ++ )
+         {
+
+             qDebug() << "ponto [" << a << "]: " << x_aux_2[a] << "," << y_aux_2[a] <<" novo ponto :"  << new_point[a];
+
+         }
+
+         //save fingers markers axis
+         int x_fingers[5] ;
+         int y_fingers[5] ;
+
+         int finger_index_left = 0 ;
+         int finger_index_right = 4 ;
+         for (int a = 0 ; a < sizeArray ; a ++ )
+         {
+             if(new_point[a] == 1)
+             {
+                 if (hand == 0) // if left hand,
+                 {
+
+                     x_fingers[finger_index_left] = x_aux_2[a] ;
+                     y_fingers[finger_index_left] = y_aux_2[a] ;
+                     qDebug() << "marcadores [" << finger_index_left << "]: " << x_fingers[finger_index_left] << "," << y_fingers[finger_index_left] ;
+                     finger_index_left = finger_index_left + 1 ;
+                 }
+                 else // if right hand
+                 {
+                     x_fingers[finger_index_right] = x_aux_2[a] ;
+                     y_fingers[finger_index_right] = y_aux_2[a] ;
+                     qDebug() << "marcadores [" << finger_index_right << "]: " << x_fingers[finger_index_right] << "," << y_fingers[finger_index_right] ;
+                     finger_index_right = finger_index_right - 1 ;
+                 }
+             }
+         }
+
+
+
+           namedWindow( "trial", WINDOW_AUTOSIZE );
+           imshow( "trial", frame2 );
+
+
+           for (int a = 0 ; a < contours_poly[largest_contour_index].size() ; a ++ )
+           {
+               circle( frame2, contours_poly[largest_contour_index][a], 4, Scalar(0,255,255), 1, 8, 0 );
+           }
+
+           namedWindow( "trialPoly", WINDOW_AUTOSIZE );
+           imshow( "trialPoly", frame2 );
+
+
+
+           qDebug() <<"\n" << hullsI.size();
+           qDebug() << "\n" << hullsI[largest_contour_index].size() ;
+           qDebug() << "\npolyHull :" << contours_poly[largest_contour_index].size() ;
+
+
+
+           //test to put center mark in place
+           Mat center_test;
+           int dilation_size = 1 ;
+           Mat element2 = getStructuringElement( MORPH_ELLIPSE,
+                                                Size( 2*dilation_size + 1, 2*dilation_size+1 ),
+                                                Point( dilation_size, dilation_size ) );
+           // Apply the dilation operation
+           dilate( erosion_dst , center_test , element2 );
+           namedWindow( "center", WINDOW_AUTOSIZE );
+           imshow( "center", center_test );
+
+
+           // get the mass center of a black and white image
+           // another try for mass center
+           Moments m = moments(center_test, false);
+           Point p1(m.m10/m.m00, m.m01/m.m00);
+           Point delta(0,40);
+           Point p;
+           p = p1 - delta ;
+
+           circle(center_test, p, 5, Scalar(128,0,0), -1);
+           circle(cropped, p, 5, Scalar(128,0,0), -1);
+           imshow("center", center_test);
+           imshow("cropped", cropped);
+
+
+           int Xdelta_repositioning[6] ;
+           int Ydelta_repositioning[6] ;
+
+           if (hand == 1 ) // right hand
+           {
+               Xdelta_repositioning[0] = 0 ;   // centro
+               Xdelta_repositioning[1] = 15 ;  // dedao
+               Xdelta_repositioning[2] = 0 ;   // indicador
+               Xdelta_repositioning[3] = 0 ;   // medio
+               Xdelta_repositioning[4] = 0 ;   // anelar
+               Xdelta_repositioning[5] = -5 ;  // mindinho
+
+               Ydelta_repositioning[0] = 0 ;   // centro
+               Ydelta_repositioning[1] = -10 ;  // dedao
+               Ydelta_repositioning[2] = -20 ; // indicador
+               Ydelta_repositioning[3] = -20 ; // medio
+               Ydelta_repositioning[4] = -20 ; // anelar
+               Ydelta_repositioning[5] = 0 ;   // mindinho
+           }
+           else // left hand
+           {
+               Xdelta_repositioning[0] = 0 ;   // centro
+               Xdelta_repositioning[1] = -15 ; // dedao
+               Xdelta_repositioning[2] = 0 ;   // indicador
+               Xdelta_repositioning[3] = 0 ;   // medio
+               Xdelta_repositioning[4] = 0 ;   // anelar
+               Xdelta_repositioning[5] = 5 ;   // mindinho
+
+               Ydelta_repositioning[0] = 0 ; //centro
+               Ydelta_repositioning[1] = -10 ; //dedao
+               Ydelta_repositioning[2] = -20 ; // indicador
+               Ydelta_repositioning[3] = -20 ; // medio
+               Ydelta_repositioning[4] = -20 ; // anelar
+               Ydelta_repositioning[5] = 0 ; // mindinho
+           }
+
+           // update markers position array for repositioning
+           // mark 2 = thumb
+           // mark 6 = little finger
+           x_markers[image_number*6]   = p.x - ceil(wc/2) + Xdelta_repositioning[0] ;
+           x_markers[image_number*6+1] = x_fingers[4] - ceil(wf/2) + Xdelta_repositioning[1] ;
+           x_markers[image_number*6+2] = x_fingers[3] - ceil(wf/2) + Xdelta_repositioning[2] ;
+           x_markers[image_number*6+3] = x_fingers[2] - ceil(wf/2) + Xdelta_repositioning[3] ;
+           x_markers[image_number*6+4] = x_fingers[1] - ceil(wf/2) + Xdelta_repositioning[4] ;
+           x_markers[image_number*6+5] = x_fingers[0] - ceil(wf/2) + Xdelta_repositioning[5] ;
+
+           // adjust y axis after crop -> crop is 30 on y axis.
+           // adjust also the size of the marker to draw exactly on the center
+           y_markers[image_number*6]   = p.y + 30 - ceil(wc/2) + Ydelta_repositioning[0] ;
+           y_markers[image_number*6+1] = y_fingers[4] + 30 - ceil(wf/2) + Ydelta_repositioning[1] ;
+           y_markers[image_number*6+2] = y_fingers[3] + 30 - ceil(wf/2) + Ydelta_repositioning[2] ;
+           y_markers[image_number*6+3] = y_fingers[2] + 30 - ceil(wf/2) + Ydelta_repositioning[3] ;
+           y_markers[image_number*6+4] = y_fingers[1] + 30 - ceil(wf/2) + Ydelta_repositioning[4] ;
+           y_markers[image_number*6+5] = y_fingers[0] + 30 - ceil(wf/2) + Ydelta_repositioning[5] ;
+
+           size_bigger[image_number*6]   = wc;
+           size_bigger[image_number*6+1] = wc;
+           size_bigger[image_number*6+2] = wc;
+           size_bigger[image_number*6+3] = wc;
+           size_bigger[image_number*6+4] = wc;
+           size_bigger[image_number*6+5] = wc;
+
+           size_smaller[image_number*6]   = wf;
+           size_smaller[image_number*6+1] = wf;
+           size_smaller[image_number*6+2] = wf;
+           size_smaller[image_number*6+3] = wf;
+           size_smaller[image_number*6+4] = wf;
+           size_smaller[image_number*6+5] = wf;
     }
-    //imshow("source", image);
-   // imshow("window", image);
 
-    imshow("window", binary_image) ;
-    *
-    * *
+
+           // redraw marker . this is important, otherwise doesnt work.
+
+          mark1->setX(x_markers[image_number*6]) ;
+          mark1->setY(y_markers[image_number*6]) ;
+          mark1->w_m = wc  ;
+          mark1->h_m = hc ;
+          scene->removeItem(mark1);
+          scene->addItem(mark1);
+          mark1->setToolTip("marcador central");
+
+
+          mark2->setX(x_markers[image_number*6+1]) ;
+          mark2->setY(y_markers[image_number*6+1]) ;
+          mark2->w_m = wf ;
+          mark2->h_m = hf ;
+          scene->removeItem(mark2);
+          scene->addItem(mark2);
+
+          mark3->setX(x_markers[image_number*6+2]) ;
+          mark3->setY(y_markers[image_number*6+2]) ;
+          mark3->w_m = wf ;
+          mark3->h_m = hf ;
+          scene->removeItem(mark3);
+          scene->addItem(mark3);
+
+          mark4->setX(x_markers[image_number*6+3]) ;
+          mark4->setY(y_markers[image_number*6+3]) ;
+          mark4->w_m = wf ;
+          mark4->h_m = hf ;
+          scene->removeItem(mark4);
+          scene->addItem(mark4);
+
+          mark5->setX(x_markers[image_number*6+4]) ;
+          mark5->setY(y_markers[image_number*6+4]) ;
+          mark5->w_m = wf ;
+          mark5->h_m = hf ;
+          scene->removeItem(mark5);
+          scene->addItem(mark5);
+
+          mark6->setX(x_markers[image_number*6+5]) ;
+          mark6->setY(y_markers[image_number*6+5]) ;
+          mark6->w_m = wf ;
+          mark6->h_m = hf ;
+          scene->removeItem(mark6);
+          scene->addItem(mark6);
+
+          mark2->setToolTip("marcador dedo polegar");
+          mark3->setToolTip("marcador dedo indicador");
+          mark4->setToolTip("marcador dedo medio");
+          mark5->setToolTip("marcador dedo anelar");
+          mark6->setToolTip("marcador dedo minimo");
+
+
+          // update temperatures
+          on_temperature_clicked();
+
+
+
+
+        // createTrackbar( "cany_thres:", "canny_image", &lowThreshold, max_lowThreshold, canny_thres );
+        // canny_thres(0,0);
+
+
+
+         // resultado melhor com gaussian e thres de aprox 11 e razao 3
+
+         /* begin trackbars
+
+
+         createTrackbar( "Element dilation :\n 0: Rect \n 1: Cross \n 2: Ellipse", "canny_image",
+                          &dilation_elem, max_elem,
+                          Dilation );
+
+        createTrackbar( "Kernel size dilation:\n 2n +1", "canny_image",
+                          &dilation_size, max_kernel_size,
+                          Dilation );
+        Dilation( 0, 0 );
+
+        /// Create Erosion Trackbar
+         createTrackbar( "Element eroison:\n 0: Rect \n 1: Cross \n 2: Ellipse", "canny_image",
+                     &erosion_elem, max_elem,
+                 Erosion );
+
+         createTrackbar( "Kernel size erosion:\n 2n +1", "canny_image",
+                 &erosion_size, max_kernel_size,
+                 Erosion );
+
+         Erosion (0,0);
+
+    */ // enf of track bars
+
+
+         //Canny( cropped, cropped_binary, 50, 200, 3 );
+
+       //  imshow( "canny_image", cropped_binary );
+    /*
+         // contours
+         vector<vector<Point> > contours;
+         vector<Vec4i> hierarchy;
+         RNG rng(12345);
+         findContours( cropped_binary, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+         // Find the convex hull object for each contour
+            vector<vector<Point> >hull( contours.size() );
+            for( int i = 0; i < contours.size(); i++ )
+            {
+                convexHull( Mat(contours[i]), hull[i], false );
+            }
+
+         Mat drawing = Mat::zeros( cropped_binary.size(), CV_8UC3 );
+            for( int i = 0; i< contours.size(); i++ )
+               {
+                 Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+                 drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+                 drawContours( drawing, hull, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+               }
+
+            /// Show in a window
+            namedWindow( "contours", WINDOW_AUTOSIZE );
+            imshow( "contours", drawing );
+
     */
 
 
-    //hconcat(image, image2, newImage);
+        // end of another try using canny
 
-
-    /*
-     namedWindow("Object Detection", CV_WINDOW_AUTOSIZE );
-     namedWindow("Original", CV_WINDOW_AUTOSIZE );
-     frame = image;
-     newImage = image;
-        //-- Trackbars to set thresholds for RGB values
-     createTrackbar("Low R","Object Detection", &low_r, 255, on_low_r_thresh_trackbar);
-        createTrackbar("High R","Object Detection", &high_r, 255, on_high_r_thresh_trackbar);
-        createTrackbar("Low G","Object Detection", &low_g, 255, on_low_g_thresh_trackbar);
-        createTrackbar("High G","Object Detection", &high_g, 255, on_high_g_thresh_trackbar);
-        createTrackbar("Low B","Object Detection", &low_b, 255, on_low_b_thresh_trackbar);
-        createTrackbar("High B","Object Detection", &high_b, 255, on_high_b_thresh_trackbar);
-
-*/
-     // begin of hand segmentation
-
-     // color threasholding. these values were obtained empirically using trackbars
-    // inRange(image,Scalar(0,128,0), Scalar(255,239,174),frame_threshold);
+         // -----------------------
+        // Gray scale
 
         /*
+         *
+        Mat image_gray(image.size(),CV_8UC1);
+        //Mat binary_image ;
 
-     // invert image
-     bitwise_not ( frame_threshold, frame_threshold );
+        cvtColor( image, image_gray, CV_BGR2GRAY );
 
-     // contours
-     vector<vector<Point> > contours;
-     vector<Vec4i> hierarchy;
-     RNG rng(12345);
-     findContours( frame_threshold, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0) );
+        Mat cdst ;
 
 
-     // convex hull
+        namedWindow("window", CV_WINDOW_AUTOSIZE );
 
-     // Find the convex hull object for each contour
-        vector<vector<Point> >hull( contours.size() );
-        for( int i = 0; i < contours.size(); i++ )
+        //createTrackbar( "Min Threshold:", "window", &lowThreshold, max_lowThreshold, on_trackbar );
+
+        //Canny( image_gray, binary_image, 50, 50*3, 3 );
+          //createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold, CannyThreshold );
+        //blur( image_gray, binary_image, Size(9,9) );
+
+
+
+        Canny( image, binary_image, 50, 200, 3 );
+        cvtColor(binary_image, cdst, CV_GRAY2BGR);
+        /*
+         * createTrackbar( "Element:\n 0: Rect \n 1: Cross \n 2: Ellipse", "window",
+                          &dilation_elem, max_elem,
+                          Dilation );
+
+        //createTrackbar( "Kernel size:\n 2n +1", "window",
+                          &dilation_size, max_kernel_size,
+                          Dilation );
+        Dilation( 0, 0 );
+
+
+        vector<Vec2f> lines;
+        HoughLines(binary_image, lines, 1, CV_PI/180, 30, 0, 0 );
+
+        for( size_t i = 0; i < lines.size(); i++ )
         {
-            convexHull( Mat(contours[i]), hull[i], false );
+          float rho = lines[i][0], theta = lines[i][1];
+          Point pt1, pt2;
+          double a = cos(theta), b = sin(theta);
+          double x0 = a*rho, y0 = b*rho;
+          pt1.x = cvRound(x0 + 1000*(-b));
+          pt1.y = cvRound(y0 + 1000*(a));
+          pt2.x = cvRound(x0 - 1000*(-b));
+          pt2.y = cvRound(y0 - 1000*(a));
+          line( cdst, pt1, pt2, Scalar(0,0,255), 1, CV_AA);
         }
+        //imshow("source", image);
+       // imshow("window", image);
 
-
-
-
-     Mat drawing = Mat::zeros( frame_threshold.size(), CV_8UC3 );
-        for( int i = 0; i< contours.size(); i++ )
-           {
-             Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-             drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
-             drawContours( drawing, hull, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
-           }
-
-        /// Show in a window
-        namedWindow( "Hull demo", WINDOW_AUTOSIZE );
-        imshow( "Hull demo", drawing );
-
-
+        imshow("window", binary_image) ;
+        *
+        * *
         */
 
-     //imshow("Object Detection",frame_threshold);
+
+        //hconcat(image, image2, newImage);
 
 
-     //imshow("Original",image);
+        /*
+         namedWindow("Object Detection", CV_WINDOW_AUTOSIZE );
+         namedWindow("Original", CV_WINDOW_AUTOSIZE );
+         frame = image;
+         newImage = image;
+            //-- Trackbars to set thresholds for RGB values
+         createTrackbar("Low R","Object Detection", &low_r, 255, on_low_r_thresh_trackbar);
+            createTrackbar("High R","Object Detection", &high_r, 255, on_high_r_thresh_trackbar);
+            createTrackbar("Low G","Object Detection", &low_g, 255, on_low_g_thresh_trackbar);
+            createTrackbar("High G","Object Detection", &high_g, 255, on_high_g_thresh_trackbar);
+            createTrackbar("Low B","Object Detection", &low_b, 255, on_low_b_thresh_trackbar);
+            createTrackbar("High B","Object Detection", &high_b, 255, on_high_b_thresh_trackbar);
+
+    */
+         // begin of hand segmentation
+
+         // color threasholding. these values were obtained empirically using trackbars
+        // inRange(image,Scalar(0,128,0), Scalar(255,239,174),frame_threshold);
+
+            /*
+
+         // invert image
+         bitwise_not ( frame_threshold, frame_threshold );
+
+         // contours
+         vector<vector<Point> > contours;
+         vector<Vec4i> hierarchy;
+         RNG rng(12345);
+         findContours( frame_threshold, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+
+         // convex hull
+
+         // Find the convex hull object for each contour
+            vector<vector<Point> >hull( contours.size() );
+            for( int i = 0; i < contours.size(); i++ )
+            {
+                convexHull( Mat(contours[i]), hull[i], false );
+            }
+
+
+
+
+         Mat drawing = Mat::zeros( frame_threshold.size(), CV_8UC3 );
+            for( int i = 0; i< contours.size(); i++ )
+               {
+                 Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+                 drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+                 drawContours( drawing, hull, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+               }
+
+            /// Show in a window
+            namedWindow( "Hull demo", WINDOW_AUTOSIZE );
+            imshow( "Hull demo", drawing );
+
+
+            */
+
+         //imshow("Object Detection",frame_threshold);
+
+
+         //imshow("Original",image);
 
 
 
