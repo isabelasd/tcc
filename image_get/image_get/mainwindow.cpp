@@ -1003,6 +1003,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui -> actionSalvar->setEnabled(false);
 
     ui->processingMethod->setEnabled(false);
+    ui->pushButton->setEnabled(false);
 
     ui->photo_index->setText("Nenhuma foto valida selecionada");
 
@@ -1058,6 +1059,7 @@ void MainWindow::on_diretorio_clicked()
             ui -> actionSalvar->setEnabled(false);
 
             ui->processingMethod->setEnabled(false);
+            ui->pushButton->setEnabled(false);
 
             ui->spinBox->setEnabled(false);
             ui->spinBox_2->setEnabled(false);
@@ -1184,6 +1186,7 @@ void MainWindow::on_diretorio_clicked()
             ui -> actionSalvar -> setEnabled(true);
 
             ui->processingMethod->setEnabled(true);
+            ui->pushButton->setEnabled(true);
 
             ui -> spinBox -> setEnabled(true);
             ui -> spinBox -> setValue(size_bigger[6 * image_number]) ;
@@ -1222,6 +1225,7 @@ void MainWindow::on_diretorio_clicked()
         ui -> actionSalvar->setEnabled(false);
 
         ui->processingMethod->setEnabled(false);
+        ui->pushButton->setEnabled(false);
 
         ui->spinBox->setEnabled(false);
         ui->spinBox_2->setEnabled(false);
@@ -2813,10 +2817,17 @@ void MainWindow::on_actionSalvar_triggered()
 
 void MainWindow::on_actionComo_usar_o_programa_triggered()
 {
-    QMessageBox::information(this,"Ajuda","Digitar ajuda aqui");
+    QMessageBox::information(this,"Ajuda","- Este programa abre somente pastas com 12 imagens .png. Caso o diretorio desejado nao tenha 12 imagens, por favor, selecione um diretorio valido."
+                                          "<br><br>- Selecione o metodo de processamento desejado. Os marcadores podem ser movidos utilizando o mouse tambem."
+                                          "<br><br>- O tamanho dos marcadores podem ser ajustados utilizando as setas em marcador central e marcadores dedos. Os marcadores dos dedos possuem sempre o mesmo tamanho. "
+                                          "<br><br>- Apos posicionamento como desejado, clique em temperatura para obter as temperaturas medias dentro de cada marcador."
+                                          "<br><br>- Clique em proximo e anterior para navegar entre as imagens. Ao clicar em processa, os marcadores da proxima imagem serao posicionados automaticamente."
+                                          "<br><br>- Caso queira editar a ficha do paciente, clique em editar ficha e atualize as informacoes desejadas clicando em Salve depois de finalizado. Caso nao queira salvar, apenas cancele."
+                                          "<br><br>- Caso queira salvar salvar uma imagem com os marcadores em cima, clique em salvar alteracoes que uma pasta com o nome editadas sera criado dentro do diretorio base com os marcadores posicionados. Essas imagens podem ser usadas em outros arquivos (.doc e pdf, por exemplo)."
+                                          "<br><br>- Os dados de temperatura de cada paciente serao atualizados no arquivo BLABLABLA. ");
 }
 
 void MainWindow::on_actionSobre_triggered()
 {
-    QMessageBox::information(this,"Sobre","Digitar sobre os autores aqui");
+    QMessageBox::information(this,"Sobre","<b>Versao</b> 1.0.0 2017 <br>Este software foi desenvolvido por <b>Isabela Sardeto Deolindo</b> e <b>Suellen Guimaraes Mahfoud</b>. <br>Contatos : isabela_deolindo@hotmail.com e su.gma@hotmail.com.");
 }
