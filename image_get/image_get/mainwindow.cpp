@@ -24,7 +24,6 @@ int const max_kernel_size = 21;
 
 bool warm_hand = false;
 
-int position_method ;
 
 
 
@@ -329,7 +328,6 @@ void Erosion (int, void*)
       {
             qDebug() << "ponto[" << a << "]: " << markers_aux_X[a] << "," << markers_aux_Y[a];
       }
-
       */
 
 
@@ -366,8 +364,6 @@ void Erosion (int, void*)
                 qDebug << "\n hull "  <<  QString::number(hull[i][j]) ;
             }
         }
-
-
         for ( int i = 0 ; i < hullsI.size() ; i++)
         {
             for ( int j = 0 ; j < hullsI[i].size() ; j++)
@@ -396,7 +392,6 @@ void Erosion (int, void*)
          {
              convexHull( Mat(contours[i]), hull[i], false );
          }
-
       Mat drawing = Mat::zeros( erosion_dst.size(), CV_8UC3 );
          for( int i = 0; i< contours.size(); i++ )
             {
@@ -405,14 +400,9 @@ void Erosion (int, void*)
               drawContours( drawing, hull, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
               //circle( drawing, hull_points[i], 4, Scalar(0,0,255), -1, 8, 0 );
             }
-
          // Show in a window
          namedWindow( "Hull demo", WINDOW_AUTOSIZE );
          imshow( "Hull demo", drawing );
-
-
-
-
          */
        //  ---------------------
          // largest area trial
@@ -420,7 +410,6 @@ void Erosion (int, void*)
          int largest_area=0;
           int largest_contour_index=0;
           Rect bounding_rect;
-
          for( int i = 0; i< hull.size(); i++ ) // iterate through each contour.
                {
                 double a=contourArea( hull[i],false);  //  Find the area of contour
@@ -429,17 +418,14 @@ void Erosion (int, void*)
                 largest_contour_index=i;                //Store the index of largest contour
                 bounding_rect=boundingRect(hull[i]); // Find the bounding rectangle for biggest contour
                 }
-
                }
          Mat drawing_center = Mat::zeros( drawing.size(), CV_8UC3 );
-
           Scalar color( 0,0,255);
           drawContours( drawing_center, hull,largest_contour_index, color, CV_FILLED, 8, hierarchy ); // Draw the largest contour using previously stored index.
           circle( cropped, mc[largest_contour_index], 4, Scalar(255,0,0), -1, 8, 0 );
           rectangle(drawing, bounding_rect,  Scalar(0,255,0),1, 8,0);
           //imshow( "src", src );
           //imshow( "largest Contour", dst );
-
           // Show in a window
           namedWindow( "contour", WINDOW_AUTOSIZE );
           imshow( "contour", drawing_center );
@@ -452,28 +438,21 @@ void Erosion (int, void*)
          /*
          // sort contours
          std::sort(hull.begin(), hull.end(), compareContourAreas);
-
          // grab contours
          std::vector<cv::Point> biggestContour = hull[hull.size()-1];
-
          Mat drawing_center = Mat::zeros( drawing.size(), CV_8UC3 );
-
          Scalar color( 0,0,255);
          polylines(drawing_center, biggestContour, true, color, 1, 8);
-
          // Get the moments
            vector<Moments> mu(hull.size() );
            for( int i = 0; i < hull.size(); i++ )
               { mu[i] = moments( hull[i], false ); }
-
            //  Get the mass centers:
            vector<Point2f> mc( hull.size() );
            for( int i = 0; i < hull.size(); i++ )
               { mc[i] = Point2f( mu[i].m10/mu[i].m00 , mu[i].m01/mu[i].m00 ); }
-
            circle( drawing_center, mc[hull.size()-1], 4, Scalar(255,0,0), -1, 8, 0 );
            circle( cropped, mc[hull.size()-1], 4, Scalar(255,0,0), -1, 8, 0 );
-
           // Show in a window
           namedWindow( "contour", WINDOW_AUTOSIZE );
           imshow( "contour", drawing_center );
@@ -1003,6 +982,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui -> actionSalvar->setEnabled(false);
 
     ui->processingMethod->setEnabled(false);
+
     ui->pushButton->setEnabled(false);
 
     ui->photo_index->setText("Nenhuma foto valida selecionada");
@@ -1059,6 +1039,8 @@ void MainWindow::on_diretorio_clicked()
             ui -> actionSalvar->setEnabled(false);
 
             ui->processingMethod->setEnabled(false);
+            ui->processingMethod->setCurrentIndex(0);
+
             ui->pushButton->setEnabled(false);
 
             ui->spinBox->setEnabled(false);
@@ -1186,6 +1168,8 @@ void MainWindow::on_diretorio_clicked()
             ui -> actionSalvar -> setEnabled(true);
 
             ui->processingMethod->setEnabled(true);
+            ui->processingMethod->setCurrentIndex(0);
+
             ui->pushButton->setEnabled(true);
 
             ui -> spinBox -> setEnabled(true);
@@ -1225,6 +1209,8 @@ void MainWindow::on_diretorio_clicked()
         ui -> actionSalvar->setEnabled(false);
 
         ui->processingMethod->setEnabled(false);
+        ui->processingMethod->setCurrentIndex(0);
+
         ui->pushButton->setEnabled(false);
 
         ui->spinBox->setEnabled(false);
@@ -1271,7 +1257,7 @@ void MainWindow::on_temperature_clicked()
     // read image (using the path)
     image = imread( path_att_cv );
 
-    // draw markers    
+    // draw markers
     rectangle(image,Point(coordinates[0],coordinates[1]), Point(coordinates[2],coordinates[3]), Scalar(0,0,0), 1);
     rectangle(image,Point(coordinates[4],coordinates[5]), Point(coordinates[6],coordinates[7]), Scalar(0,0,0), 1);
     rectangle(image,Point(coordinates[8],coordinates[9]), Point(coordinates[10],coordinates[11]), Scalar(0,0,0), 1);
@@ -1943,14 +1929,14 @@ void MainWindow::on_processingMethod_currentIndexChanged(const QString &arg1)
 {
     if(arg1 == "metodo1")
     {
-        position_method = 1 ;
+        //position_method = 1 ;
         qDebug() << "\n Metodo: " << arg1 ;
         on_pushButton_clicked();
     }
 
     if(arg1 == "metodo2")
     {
-        position_method = 2 ;
+        //position_method = 2 ;
         qDebug() << "\n Metodo: " << arg1 ;
     }
 }
@@ -1978,7 +1964,7 @@ void MainWindow::on_pushButton_clicked()
 
     // BEGIN OF METHOD 1
     // ---------- begin of crop image ----------
-    if (position_method == 1 )
+    if (ui->processingMethod->currentIndex() == 0 )
     {
         // Setup a rectangle to define your region of interest
         cv::Rect myROI(0, 30, 320, 210);
@@ -1996,58 +1982,36 @@ void MainWindow::on_pushButton_clicked()
         // ---------- end of crop image ----------
     /*
         // get BGR mean value inside a rectangle
-
         rectangle(cropped,Point(3,3), Point(10,190), Scalar(0,0,0), 1);
-
-
         int intensitymean[3] = {};
         int intensity_test[3];
         intensity_test[0] = 0 ; // B
         intensity_test[1] = 0 ; // G
         intensity_test[2] = 0 ; // R
-
         getIntensityBGR(cropped, 3,3,10,190, intensity_test);
         intensitymean[0] = intensity_test[0];
         intensitymean[1] = intensity_test[1];
         intensitymean[2] = intensity_test[2];
-
         qDebug() << " b: " << QString::number(intensitymean[0]) << " g: " << QString::number(intensitymean[1]) << " r: " << QString::number(intensitymean[2]) ;
-
-
         removeBackground(cropped, intensitymean);
-
         Mat cropped_gray(cropped.size(),CV_8UC1);
-
         cvtColor( cropped, cropped_gray, CV_BGR2GRAY );
-
         threshold( cropped_gray, cropped, 127, 255,0 );
-
-
-
       // bitwise_not(cropped,cropped);
         imshow( "cropped", cropped );
-
         //threshold( src_gray, dst, threshold_value, max_BINARY_value,threshold_type );
-
         // contours
         vector<vector<Point> > contours;
         vector<Vec4i> hierarchy;
         RNG rng(12345);
         findContours( cropped, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0) );
-
-
         // convex hull
-
         // Find the convex hull object for each contour
            vector<vector<Point> >hull( contours.size() );
            for( int i = 0; i < contours.size(); i++ )
            {
                convexHull( Mat(contours[i]), hull[i], false );
            }
-
-
-
-
         Mat drawing = Mat::zeros( cropped.size(), CV_8UC3 );
            for( int i = 0; i< contours.size(); i++ )
               {
@@ -2055,11 +2019,9 @@ void MainWindow::on_pushButton_clicked()
                 drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
                 drawContours( drawing, hull, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
               }
-
            /// Show in a window
            namedWindow( "Hull demo", WINDOW_AUTOSIZE );
            imshow( "Hull demo", drawing );
-
     */
 
     // end of segmentation using mean threashold.
@@ -2078,7 +2040,7 @@ void MainWindow::on_pushButton_clicked()
          get_colors[1] = 0 ; // G
          get_colors[2] = 0 ; // R
          getIntensityBGR(cropped, 0 , 0 , cropped.size().width , cropped.size().height , get_colors);
-         if (get_colors[2]  > 35 )
+         if (get_colors[2]  > 35 ) // tava 35
          {
              warm_hand = true;
              //lowThreshold = 45;
@@ -2345,7 +2307,7 @@ void MainWindow::on_pushButton_clicked()
              for (int i = 0 ; i < sizeArray ; i++)
              {
 
-                if ( distanceArray[i] > 20 )
+                if ( distanceArray[i] > 17 )
                 {
                     if ( total_points < 5 )
                     {
@@ -2369,7 +2331,7 @@ void MainWindow::on_pushButton_clicked()
          {
             for (int i = sizeArray-1 ; i > 0 ; i--)
              {
-                if ( distanceArray[i-1] > 20 )
+                if ( distanceArray[i-1] > 17 )
                 {
                    if ( total_points < 5 )
                    {
@@ -2521,6 +2483,20 @@ void MainWindow::on_pushButton_clicked()
            x_markers[image_number*6+4] = x_fingers[1] - ceil(wf/2) + Xdelta_repositioning[4] ;
            x_markers[image_number*6+5] = x_fingers[0] - ceil(wf/2) + Xdelta_repositioning[5] ;
 
+           //adjust error , if the position is outside the picture range for x axis
+           int error_x = 0;
+           for (int i = 0 ; i < 6 ; i++)
+           {
+               if(x_markers[image_number*6+i] < 0 || x_markers[image_number*6+i] > cropped.size().width )
+               {
+                   x_markers[image_number*6+i] = error_x * 10 ; ;
+                   error_x++;
+                   qDebug() << "number of x errors : " << error_x;
+
+               }
+
+           }
+
            // adjust y axis after crop -> crop is 30 on y axis.
            // adjust also the size of the marker to draw exactly on the center
            y_markers[image_number*6]   = p.y + 30 - ceil(wc/2) + Ydelta_repositioning[0] ;
@@ -2529,6 +2505,19 @@ void MainWindow::on_pushButton_clicked()
            y_markers[image_number*6+3] = y_fingers[2] + 30 - ceil(wf/2) + Ydelta_repositioning[3] ;
            y_markers[image_number*6+4] = y_fingers[1] + 30 - ceil(wf/2) + Ydelta_repositioning[4] ;
            y_markers[image_number*6+5] = y_fingers[0] + 30 - ceil(wf/2) + Ydelta_repositioning[5] ;
+
+           //adjust error , if the position is outside the picture range for y axis
+           int error_y = 0;
+           for (int i = 0 ; i < 6 ; i++)
+           {
+               if(y_markers[image_number*6+i] < 0 || y_markers[image_number*6+i] > cropped.size().height )
+               {
+                   y_markers[image_number*6+i] = 30 ; ;
+                   error_y++;
+                   qDebug() << "number of y errors : " << error_y;
+               }
+
+           }
 
            size_bigger[image_number*6]   = wc;
            size_bigger[image_number*6+1] = wc;
@@ -2613,28 +2602,21 @@ void MainWindow::on_pushButton_clicked()
          // resultado melhor com gaussian e thres de aprox 11 e razao 3
 
          /* begin trackbars
-
-
          createTrackbar( "Element dilation :\n 0: Rect \n 1: Cross \n 2: Ellipse", "canny_image",
                           &dilation_elem, max_elem,
                           Dilation );
-
         createTrackbar( "Kernel size dilation:\n 2n +1", "canny_image",
                           &dilation_size, max_kernel_size,
                           Dilation );
         Dilation( 0, 0 );
-
         /// Create Erosion Trackbar
          createTrackbar( "Element eroison:\n 0: Rect \n 1: Cross \n 2: Ellipse", "canny_image",
                      &erosion_elem, max_elem,
                  Erosion );
-
          createTrackbar( "Kernel size erosion:\n 2n +1", "canny_image",
                  &erosion_size, max_kernel_size,
                  Erosion );
-
          Erosion (0,0);
-
     */ // enf of track bars
 
 
@@ -2647,14 +2629,12 @@ void MainWindow::on_pushButton_clicked()
          vector<Vec4i> hierarchy;
          RNG rng(12345);
          findContours( cropped_binary, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0) );
-
          // Find the convex hull object for each contour
             vector<vector<Point> >hull( contours.size() );
             for( int i = 0; i < contours.size(); i++ )
             {
                 convexHull( Mat(contours[i]), hull[i], false );
             }
-
          Mat drawing = Mat::zeros( cropped_binary.size(), CV_8UC3 );
             for( int i = 0; i< contours.size(); i++ )
                {
@@ -2662,11 +2642,9 @@ void MainWindow::on_pushButton_clicked()
                  drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
                  drawContours( drawing, hull, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
                }
-
             /// Show in a window
             namedWindow( "contours", WINDOW_AUTOSIZE );
             imshow( "contours", drawing );
-
     */
 
 
@@ -2679,38 +2657,25 @@ void MainWindow::on_pushButton_clicked()
          *
         Mat image_gray(image.size(),CV_8UC1);
         //Mat binary_image ;
-
         cvtColor( image, image_gray, CV_BGR2GRAY );
-
         Mat cdst ;
-
-
         namedWindow("window", CV_WINDOW_AUTOSIZE );
-
         //createTrackbar( "Min Threshold:", "window", &lowThreshold, max_lowThreshold, on_trackbar );
-
         //Canny( image_gray, binary_image, 50, 50*3, 3 );
           //createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold, CannyThreshold );
         //blur( image_gray, binary_image, Size(9,9) );
-
-
-
         Canny( image, binary_image, 50, 200, 3 );
         cvtColor(binary_image, cdst, CV_GRAY2BGR);
         /*
          * createTrackbar( "Element:\n 0: Rect \n 1: Cross \n 2: Ellipse", "window",
                           &dilation_elem, max_elem,
                           Dilation );
-
         //createTrackbar( "Kernel size:\n 2n +1", "window",
                           &dilation_size, max_kernel_size,
                           Dilation );
         Dilation( 0, 0 );
-
-
         vector<Vec2f> lines;
         HoughLines(binary_image, lines, 1, CV_PI/180, 30, 0, 0 );
-
         for( size_t i = 0; i < lines.size(); i++ )
         {
           float rho = lines[i][0], theta = lines[i][1];
@@ -2725,7 +2690,6 @@ void MainWindow::on_pushButton_clicked()
         }
         //imshow("source", image);
        // imshow("window", image);
-
         imshow("window", binary_image) ;
         *
         * *
@@ -2747,7 +2711,6 @@ void MainWindow::on_pushButton_clicked()
             createTrackbar("High G","Object Detection", &high_g, 255, on_high_g_thresh_trackbar);
             createTrackbar("Low B","Object Detection", &low_b, 255, on_low_b_thresh_trackbar);
             createTrackbar("High B","Object Detection", &high_b, 255, on_high_b_thresh_trackbar);
-
     */
          // begin of hand segmentation
 
@@ -2755,29 +2718,20 @@ void MainWindow::on_pushButton_clicked()
         // inRange(image,Scalar(0,128,0), Scalar(255,239,174),frame_threshold);
 
             /*
-
          // invert image
          bitwise_not ( frame_threshold, frame_threshold );
-
          // contours
          vector<vector<Point> > contours;
          vector<Vec4i> hierarchy;
          RNG rng(12345);
          findContours( frame_threshold, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0) );
-
-
          // convex hull
-
          // Find the convex hull object for each contour
             vector<vector<Point> >hull( contours.size() );
             for( int i = 0; i < contours.size(); i++ )
             {
                 convexHull( Mat(contours[i]), hull[i], false );
             }
-
-
-
-
          Mat drawing = Mat::zeros( frame_threshold.size(), CV_8UC3 );
             for( int i = 0; i< contours.size(); i++ )
                {
@@ -2785,12 +2739,9 @@ void MainWindow::on_pushButton_clicked()
                  drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
                  drawContours( drawing, hull, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
                }
-
             /// Show in a window
             namedWindow( "Hull demo", WINDOW_AUTOSIZE );
             imshow( "Hull demo", drawing );
-
-
             */
 
          //imshow("Object Detection",frame_threshold);
